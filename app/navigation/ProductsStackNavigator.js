@@ -1,57 +1,20 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
-import { SCREEN_NAMES } from '../types';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// Product Screens
-import ProductsScreen from '../screens/ProductDetailsScreen';
 import ProductListScreen from '../screens/ProductListScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
-// import EditProductScreen from '../screens/EditProductScreen';
-// import ProductDetailsScreen from '../screens/ProductDetailsScreen';
+import PlaceOrderScreen from '../screens/PlaceOrderScreen';
+import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
-const ProductsStackNavigator = () => {
+export default function ProductStackNavigator() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="ProductsListScreen"
-        component={ProductListScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-{/*       
-      <Stack.Screen
-        name="AddProduct"
-        component={AddProductScreen}
-        options={{
-          headerShown: false,
-        }}
-      /> */}
-      
-      {/* <Stack.Screen
-        name="EditProduct"
-        component={EditProductScreen}
-        options={{
-          headerShown: false,
-        }}
-      /> */}
-      
-      <Stack.Screen
-        name="ProductDetailsScreen"
-        component={ProductDetailsScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ProductList" component={ProductListScreen} />
+      <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+      <Stack.Screen name="PlaceOrder" component={PlaceOrderScreen} />
+      <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
     </Stack.Navigator>
   );
-};
-
-export default ProductsStackNavigator; 
+}

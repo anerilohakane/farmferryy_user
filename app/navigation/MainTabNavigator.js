@@ -1,129 +1,93 @@
 import React from 'react';
+import { View, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import { SCREEN_NAMES } from '../types';
-import { createStackNavigator } from '@react-navigation/stack';
-
-// Main Screens
-import DashboardScreen from '../screens/DashboardScreen';
+// import FarmFerryHome from '../screens/FarmFerryHome';
+import FarmFerryHome from '../screens/HomeScreen';
+import CartScreen from '../screens/CartScreen';
 import OrdersScreen from '../screens/OrdersScreen';
+import WishlistScreen from '../screens/WishlistScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import OrderDetailsScreen from '../screens/OrderDetailsScreen';
-import EditProfileScreen from '../screens/EditProfileScreen';
-// import VerificationStatusScreen from '../screens/VerificationStatusScreen';
-import ChangePasswordScreen from '../screens/ChangePasswordScreen';
-import NotificationsScreen from '../screens/NotificationsScreen';
-import SupportScreen from '../screens/SupportScreen';
-import TermsScreen from '../screens/TermsScreen';
-// import PrivacyScreen from '../screens/PrivacyScreen';
-
-// Stack Navigators
-import ProductsStackNavigator from './ProductsStackNavigator';
+import {
+  Grid3x3,
+  ShoppingCart,
+  Package,
+  Heart,
+  User
+} from 'lucide-react-native';
+import { useAppContext } from '../context/AppContext';
 
 const Tab = createBottomTabNavigator();
-const OrdersStack = createStackNavigator();
-const ProfileStack = createStackNavigator();
 
-const OrdersStackNavigator = () => (
-  <OrdersStack.Navigator screenOptions={{ headerShown: false }}>
-    <OrdersStack.Screen name="OrdersList" component={OrdersScreen} />
-    <OrdersStack.Screen name="OrderDetails" component={OrderDetailsScreen} />
-  </OrdersStack.Navigator>
-);
+export default function MainTabNavigator() {
+  const { cartCount, wishlistCount } = useAppContext(); // ✅ Get counts from context
 
-const ProfileStackNavigator = () => (
-  <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-    <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
-    <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
-    {/* <ProfileStack.Screen name="VerificationStatus" component={VerificationStatusScreen} /> */}
-    <ProfileStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
-    <ProfileStack.Screen name="Notifications" component={NotificationsScreen} />
-    <ProfileStack.Screen name="Support" component={SupportScreen} />
-    {/* <ProfileStack.Screen name="Terms" component={TermsScreen} /> */}
-    {/* <ProfileStack.Screen name="Privacy" component={PrivacyScreen} /> */}
-  </ProfileStack.Navigator>
-);
+  const renderIcon = (Icon, focused, badge) => (
+    <View className="items-center relative">
+      <Icon size={22} color={focused ? '#16a34a' : '#6b7280'} />
+      {badge > 0 && (
+        <View className="absolute -top-1 -right-2 bg-red-500 w-4 h-4 rounded-full items-center justify-center">
+          <Text className="text-white text-[10px] font-bold">{badge}</Text>
+        </View>
+      )}
+    </View>
+  );
 
-const MainTabNavigator = () => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          switch (route.name) {
-            case SCREEN_NAMES.DASHBOARD:
-              iconName = focused ? 'home' : 'home-outline';
-              break;
-            case SCREEN_NAMES.PRODUCTS:
-              iconName = focused ? 'cube' : 'cube-outline';
-              break;
-            case SCREEN_NAMES.ORDERS:
-              iconName = focused ? 'list' : 'list-outline';
-              break;
-            case SCREEN_NAMES.PROFILE:
-              iconName = focused ? 'person' : 'person-outline';
-              break;
-            default:
-              iconName = 'help-outline';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#059669',
-        tabBarInactiveTintColor: '#6b7280',
+      screenOptions={{
+        headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: '#fff',
           borderTopWidth: 1,
-          borderTopColor: '#e5e7eb',
-          paddingBottom: 5,
-          paddingTop: 5,
+          borderTopColor: '#d1fae5',
           height: 60,
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '500',
+          marginBottom: 5,
         },
-        headerShown: false,
-      })}
+      }}
     >
       <Tab.Screen
-        name={SCREEN_NAMES.DASHBOARD}
-        component={DashboardScreen}
+        name="Home"
+        component={FarmFerryHome}
         options={{
-          title: 'Dashboard',
-          headerShown: false,
+          tabBarIcon: ({ focused }) => renderIcon(Grid3x3, focused, 0),
+          tabBarLabel: 'Home'
         }}
       />
-      
       <Tab.Screen
-        name={SCREEN_NAMES.PRODUCTS}
-        component={ProductsStackNavigator}
+        name="Cart"
+        component={CartScreen}
         options={{
-          title: 'Products',
-          headerShown: false,
+          tabBarIcon: ({ focused }) => renderIcon(ShoppingCart, focused, cartCount),
+          tabBarLabel: 'Cart'
         }}
       />
-      
       <Tab.Screen
-        name={SCREEN_NAMES.ORDERS}
-        component={OrdersStackNavigator}
+        name="Orders"
+        component={OrdersScreen}
         options={{
-          title: 'Orders',
-          headerShown: false,
+          tabBarIcon: ({ focused }) => renderIcon(Package, focused, 0),
+          tabBarLabel: 'Orders'
         }}
       />
-      
       <Tab.Screen
-        name={SCREEN_NAMES.PROFILE}
-        component={ProfileStackNavigator}
+        name="Wishlist"
+        component={WishlistScreen}
         options={{
-          title: 'My Profile',
-          headerShown: false,
+          tabBarIcon: ({ focused }) => renderIcon(Heart, focused, wishlistCount),
+          tabBarLabel: 'Wishlist'
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          tabBarIcon: ({ focused }) => renderIcon(User, focused, 0),
+          tabBarLabel: 'Profile'
         }}
       />
     </Tab.Navigator>
   );
-};
-
-export default MainTabNavigator; 
+}
