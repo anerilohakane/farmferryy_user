@@ -21,6 +21,7 @@ import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 
 // Loading Screen
 import LoadingScreen from '../screens/LoadingScreen';
+import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 
 const Stack = createStackNavigator();
 
@@ -33,60 +34,70 @@ const AppNavigator = () => {
 
   return (
     //<NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
-          <>
-            <Stack.Screen
-              name="MainApp"
-              component={MainTabNavigator}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="ProductStack"
-              component={ProductStackNavigator}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="ChangePassword"
-              component={ChangePasswordScreen}
-              options={{ headerShown: true, title: 'Change Password' }}
-            />
-            <Stack.Screen
-              name="DeleteAddress"
-              component={DeleteAddressScreen}
-              options={{ headerShown: true, title: 'Delete Address' }}
-            />
-          </>
-        ) : (
-          <>
-            <Stack.Screen
-              name={SCREEN_NAMES.LOGIN}
-              component={LoginScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.REGISTER}
-              component={RegisterScreen}
-              options={{ headerShown: true, title: 'Register' }}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.PHONE_VERIFICATION}
-              component={PhoneVerificationScreen}
-              options={{ headerShown: true, title: 'Verify Phone' }}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.FORGOT_PASSWORD}
-              component={ForgotPasswordScreen}
-              options={{ headerShown: true, title: 'Forgot Password' }}
-            />
-            <Stack.Screen
-              name={SCREEN_NAMES.RESET_PASSWORD}
-              component={ResetPasswordScreen}
-              options={{ headerShown: true, title: 'Reset Password' }}
-            />
-          </>
-        )}
-      </Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {isAuthenticated ? (
+        <>
+          <Stack.Screen
+            name="MainApp"
+            component={MainTabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ProductStack"
+            component={ProductStackNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ChangePassword"
+            component={ChangePasswordScreen}
+            options={{ headerShown: true, title: 'Change Password' }}
+          />
+          <Stack.Screen
+            name="DeleteAddress"
+            component={DeleteAddressScreen}
+            options={{ headerShown: true, title: 'Delete Address' }}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.PRODUCT_DETAILS}
+            component={ProductDetailsScreen}
+            options={{ headerShown: true }}
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name={SCREEN_NAMES.LOGIN}
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.REGISTER}
+            component={RegisterScreen}
+            options={{ headerShown: true, title: 'Register' }}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.PHONE_VERIFICATION}
+            component={PhoneVerificationScreen}
+            options={{ headerShown: true, title: 'Verify Phone' }}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.FORGOT_PASSWORD}
+            component={ForgotPasswordScreen}
+            options={{ headerShown: true, title: 'Forgot Password' }}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.RESET_PASSWORD}
+            component={ResetPasswordScreen}
+            options={{ headerShown: true, title: 'Reset Password' }}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.PRODUCT_DETAILS}
+            component={ProductDetailsScreen}
+            options={{ headerShown: true }}
+          />
+        </>
+      )}
+    </Stack.Navigator>
     //</NavigationContainer>
   );
 };

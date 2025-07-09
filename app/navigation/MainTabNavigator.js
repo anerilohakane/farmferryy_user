@@ -2,18 +2,13 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // import FarmFerryHome from '../screens/FarmFerryHome';
+import HomeScreen from '../screens/HomeScreen';
 import FarmFerryHome from '../screens/HomeScreen';
 import CartScreen from '../screens/CartScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import WishlistScreen from '../screens/WishlistScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import {
-  Grid3x3,
-  ShoppingCart,
-  Package,
-  Heart,
-  User
-} from 'lucide-react-native';
+import {ShoppingCart,Package,Heart,User,Home,Truck} from 'lucide-react-native';
 import { useAppContext } from '../context/AppContext';
 
 const Tab = createBottomTabNavigator();
@@ -52,7 +47,7 @@ export default function MainTabNavigator() {
         name="Home"
         component={FarmFerryHome}
         options={{
-          tabBarIcon: ({ focused }) => renderIcon(Grid3x3, focused, 0),
+          tabBarIcon: ({ focused }) => renderIcon(Home, focused, 0),
           tabBarLabel: 'Home'
         }}
       />
@@ -68,7 +63,7 @@ export default function MainTabNavigator() {
         name="Orders"
         component={OrdersScreen}
         options={{
-          tabBarIcon: ({ focused }) => renderIcon(Package, focused, 0),
+          tabBarIcon: ({ focused }) => renderIcon(Truck, focused, 0),
           tabBarLabel: 'Orders'
         }}
       />
