@@ -1,22 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  SafeAreaView,
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Animated,
-  Dimensions,
-} from 'react-native';
-import {MapPin,Plus,Heart,Search,Filter,Star,Bell,User,ChevronRight,ArrowRight,Clock,Truck,Leaf,Percent,} from 'lucide-react-native';
+import { SafeAreaView, View, Text, TextInput, ScrollView, TouchableOpacity, Image, Animated, Dimensions, ImageBackground, } from 'react-native';
+import { MapPin, Plus, Heart, Search, Filter, Star, Bell, User, ChevronRight, ArrowRight, Clock, Truck, Leaf, Percent, } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../context/AppContext';
 import { SCREEN_NAMES } from '../types';
+import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get('window');
-const BANNER_WIDTH = width - 32; // 16px padding on each side
+const BANNER_WIDTH = width - 32;
 
 const FarmFerryHome = () => {
   const navigation = useNavigation();
@@ -28,12 +19,15 @@ const FarmFerryHome = () => {
     removeFromWishlist,
   } = useAppContext();
 
-  // Banner state and animations
   const [currentBanner, setCurrentBanner] = useState(0);
   const scrollViewRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const categories = [
+    { name: 'Vegetables', image: require('../../assets/images/vegetables.jpg') },
+    { name: 'Fruits', image: require('../../assets/images/fruits.jpg') },
+    { name: 'Grains', image: require('../../assets/images/grains.jpg') },
+    { name: 'Dry Fruits', image: require('../../assets/images/dryfruits.jpg') },
     { name: 'Vegetables', image: require('../../assets/images/vegetables.jpg') },
     { name: 'Fruits', image: require('../../assets/images/fruits.jpg') },
     { name: 'Grains', image: require('../../assets/images/grains.jpg') },
@@ -121,63 +115,42 @@ const FarmFerryHome = () => {
   const banners = [
     {
       id: 1,
-      title: '20% OFF',
-      subtitle: 'Fresh Tomatoes',
+      title: 'Free Delivery',
+      subtitle: 'Free on order 500',
       description: 'Limited time offer - Direct from farm',
-      bgColor: 'bg-green-500',
-      textColor: 'text-white',
-      buttonColor: 'bg-white',
-      buttonTextColor: 'text-green-600',
       icon: <Percent size={24} color="#fff" />,
-      image: require('../../assets/images/tomato.png'),
       tag: 'Limited Time',
-      tagColor: 'bg-red-500',
+      image: require('../../assets/images/banner2.jpg'),
     },
     {
       id: 2,
-      title: 'Free Delivery',
-      subtitle: 'On Orders Above ₹500',
+      title: '20% OFF',
+      subtitle: 'Fresh Tomatoes',
       description: 'Get fresh produce delivered to your doorstep',
-      bgColor: 'bg-blue-500',
-      textColor: 'text-white',
-      buttonColor: 'bg-white',
-      buttonTextColor: 'text-blue-600',
       icon: <Truck size={24} color="#fff" />,
-      image: require('../../assets/images/delivery.png'),
       tag: 'Free Shipping',
-      tagColor: 'bg-blue-600',
+      image: require('../../assets/images/banner1.jpg'),
     },
     {
       id: 3,
       title: '100% Organic',
       subtitle: 'Certified Fresh Vegetables',
       description: 'Farm-fresh organic produce without chemicals',
-      bgColor: 'bg-emerald-600',
-      textColor: 'text-white',
-      buttonColor: 'bg-white',
-      buttonTextColor: 'text-emerald-600',
       icon: <Leaf size={24} color="#fff" />,
-      image: require('../../assets/images/vegetables.jpg'),
       tag: 'Certified',
-      tagColor: 'bg-green-600',
+      image: require('../../assets/images/banner3.jpg'),
     },
     {
       id: 4,
       title: 'Flash Sale',
       subtitle: 'Up to 40% OFF',
       description: 'Premium fruits at unbeatable prices',
-      bgColor: 'bg-orange-500',
-      textColor: 'text-white',
-      buttonColor: 'bg-white',
-      buttonTextColor: 'text-orange-600',
       icon: <Clock size={24} color="#fff" />,
-      image: require('../../assets/images/fruits.jpg'),
       tag: 'Ends Soon',
-      tagColor: 'bg-red-500',
+      image: require('../../assets/images/banner4.jpg'),
     },
   ];
 
-  // Auto-scroll effect for banners
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBanner((prev) => {
@@ -188,12 +161,10 @@ const FarmFerryHome = () => {
         });
         return nextIndex;
       });
-    }, 4000); // Change every 4 seconds
-
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
-  // Fade animation for banner transitions
   useEffect(() => {
     Animated.sequence([
       Animated.timing(fadeAnim, {
@@ -219,7 +190,9 @@ const FarmFerryHome = () => {
   const isInCart = (id) => cartItems.some((item) => item.id === id);
 
   const toggleWishlist = (product) => {
-    isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product);
+    isInWishlist(product.id)
+      ? removeFromWishlist(product.id)
+      : addToWishlist(product);
   };
 
   const handleAddToCart = (product) => {
@@ -228,100 +201,85 @@ const FarmFerryHome = () => {
     }
   };
 
-  const renderBanner = (banner, index) => (
+  const renderBanner = (banner) => (
     <Animated.View
       key={banner.id}
-      style={{
-        width: BANNER_WIDTH,
-        opacity: fadeAnim,
-      }}
-      className={`${banner.bgColor} rounded-3xl p-6 mr-4 relative overflow-hidden`}
+      style={{ width: BANNER_WIDTH, opacity: fadeAnim }}
+      className="rounded-3xl mr-4 overflow-hidden opacity-50"
     >
-      {/* Background Pattern */}
-      <View className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white opacity-10 -mr-16 -mt-16" />
-      <View className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white opacity-10 -ml-12 -mb-12" />
-      
-      {/* Tag */}
-      <View className={`${banner.tagColor} absolute top-4 right-4 px-3 py-1 rounded-full`}>
-        <Text className="text-white text-xs font-bold">{banner.tag}</Text>
-      </View>
-
-      <View className="flex-row items-center justify-between">
-        <View className="flex-1">
-          {/* Icon and Title */}
-          <View className="flex-row items-center mb-2">
-            {banner.icon}
-            <Text className={`${banner.textColor} text-2xl font-bold ml-2`}>
-              {banner.title}
-            </Text>
+      <ImageBackground
+        source={banner.image}
+        className="w-full h-64"
+        imageStyle={{ borderRadius: 24 }}
+        resizeMode="cover"
+      >
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(100, 100, 100, 0.5)',
+          borderRadius: 24
+        }} />
+        {/* Blur the entire background */}
+        <BlurView
+          intensity={40}  // Adjust blur strength (0-100)
+          tint="light"    // "light", "dark", or "default"
+          style={{
+            flex: 1,
+            borderRadius: 24,
+            padding: 20,
+          }}
+        >
+          {/* Top-right tag (now inside BlurView) */}
+          <View className="absolute top-4 right-4 px-3 py-1 rounded-full bg-white z-10">
+            <Text className="text-green-700 text-xs font-bold">{banner.tag}</Text>
           </View>
 
-          {/* Subtitle */}
-          <Text className={`${banner.textColor} text-lg font-semibold mb-1`}>
-            {banner.subtitle}
-          </Text>
+          {/* Content container (pushes text to bottom) */}
+          <View style={{ flex: 1 }} />
 
-          {/* Description */}
-          <Text className={`${banner.textColor} opacity-90 text-sm mb-4 leading-5`}>
-            {banner.description}
-          </Text>
+          {/* Bottom text section (same as before) */}
+          <View>
+            <View className="flex-row items-center mb-2">
+              {banner.icon}
+              <Text className="text-white text-2xl font-extrabold ml-2">{banner.title}</Text>
+            </View>
+            <Text className="text-white text-lg font-bold">{banner.subtitle}</Text>
+            <Text className="text-white text-sm mb-3">{banner.description}</Text>
 
-          {/* Action Button */}
-          <TouchableOpacity
-            className={`${banner.buttonColor} rounded-xl px-4 py-3 flex-row items-center justify-center self-start`}
-            onPress={() => {
-              // Navigate to specific category or product based on banner
-              console.log(`Navigate to ${banner.subtitle}`);
-            }}
-          >
-            <Text className={`${banner.buttonTextColor} font-semibold mr-2`}>
-              Shop Now
-            </Text>
-            <ArrowRight size={16} color={banner.buttonTextColor.includes('green') ? '#15803d' : 
-                                        banner.buttonTextColor.includes('blue') ? '#2563eb' :
-                                        banner.buttonTextColor.includes('emerald') ? '#059669' : '#ea580c'} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Image */}
-        <View className="ml-4">
-          <Image
-            source={banner.image}
-            className="w-24 h-24 rounded-2xl"
-            resizeMode="cover"
-          />
-        </View>
-      </View>
-
-      {/* Bottom Stats */}
-      <View className="flex-row items-center justify-between mt-4 pt-4 border-t border-white border-opacity-20">
-        <View className="flex-row items-center">
-          <Star size={14} color="#facc15" fill="#facc15" />
-          <Text className={`${banner.textColor} text-xs ml-1 opacity-90`}>
-            4.8 Rating
-          </Text>
-        </View>
-        <View className="flex-row items-center">
-          <MapPin size={14} color="#fff" />
-          <Text className={`${banner.textColor} text-xs ml-1 opacity-90`}>
-            Local Farms
-          </Text>
-        </View>
-        <View className="flex-row items-center">
-          <Truck size={14} color="#fff" />
-          <Text className={`${banner.textColor} text-xs ml-1 opacity-90`}>
-            Fast Delivery
-          </Text>
-        </View>
-      </View>
+            <View className="flex-row items-center justify-between">
+              <TouchableOpacity
+                className="bg-white rounded-xl px-4 py-2 flex-row items-center"
+                onPress={() => console.log(`Navigate to ${banner.subtitle}`)}
+              >
+                <Text className="text-green-700 font-semibold mr-2">Shop Now</Text>
+                <ArrowRight size={16} color="#15803d" />
+              </TouchableOpacity>
+              <View className="flex-row items-center space-x-4">
+                <View className="flex-row items-center">
+                  <Star size={14} color="#facc15" fill="#facc15" />
+                  <Text className="text-white text-xs ml-1">4.8 Rating</Text>
+                </View>
+                <View className="flex-row items-center">
+                  <Truck size={14} color="#fff" />
+                  <Text className="text-white text-xs ml-1">Fast Delivery</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </BlurView>
+      </ImageBackground>
     </Animated.View>
   );
 
+
   return (
-    <SafeAreaView className="flex-1 bg-green-50">
+    <SafeAreaView className="flex-1 bg-grey-100">
       <View className="flex-1">
         {/* App Bar */}
-        <View className="bg-white px-4 py-4 flex-row justify-between items-center border-b border-green-200">
+        <View className="bg-white mt-6 px-4 py-4  flex-row justify-between items-center border-b border-green-200">
           <View className="flex-row items-center space-x-2">
             <View className="w-8 h-8 bg-green-500 rounded-full items-center justify-center">
               <Text className="text-white font-bold">F</Text>
@@ -335,11 +293,11 @@ const FarmFerryHome = () => {
             </View>
           </View>
           <View className="flex-row items-center space-x-3">
-            <View className="relative">
+            <View className="relative z-10">
               <Bell size={24} color="#15803d" />
               <View className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500" />
             </View>
-            <View className="w-8 h-8 rounded-full bg-green-100 items-center justify-center">
+            <View className="w-8 h-8 rounded-full bg-green-50 items-center justify-center">
               <User size={20} color="#15803d" />
             </View>
           </View>
@@ -364,15 +322,15 @@ const FarmFerryHome = () => {
             <Text className="text-lg font-bold text-gray-800 mb-2">Shop by Category</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {categories.map((cat, idx) => (
-                <View
-                  key={idx}
-                  className="bg-green-100 border border-green-200 rounded-2xl px-4 py-3 mr-3 items-center"
-                >
-                  <Image source={cat.image} className="w-12 h-12 rounded-full" />
-                  <Text className="text-xs mt-1 text-gray-800 font-semibold">
+                <View key={idx} className="items-center mr-4">
+                  <View className="w-16 h-16 rounded-full overflow-hidden">
+                    <Image source={cat.image} className="w-full h-full" resizeMode="cover" />
+                  </View>
+                  <Text className="text-xs mt-2 text-gray-800 font-semibold">
                     {cat.name}
                   </Text>
                 </View>
+
               ))}
             </ScrollView>
           </View>
@@ -404,9 +362,8 @@ const FarmFerryHome = () => {
                       animated: true,
                     });
                   }}
-                  className={`w-2 h-2 rounded-full ${
-                    index === currentBanner ? 'bg-green-500' : 'bg-gray-300'
-                  }`}
+                  className={`w-2 h-2 rounded-full ${index === currentBanner ? 'bg-green-500' : 'bg-gray-300'
+                    }`}
                 />
               ))}
             </View>
