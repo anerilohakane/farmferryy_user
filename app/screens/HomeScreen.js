@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SafeAreaView, View, Text, TextInput, ScrollView, TouchableOpacity, Image, Animated, Dimensions, ImageBackground, } from 'react-native';
-import { MapPin, Plus, Heart, Search, Filter, Star, Bell, User, ChevronRight, ArrowRight, Clock, Truck, Leaf, Percent, } from 'lucide-react-native';
+import { SafeAreaView, View, Text, TextInput, ScrollView, TouchableOpacity, Image, Animated, Dimensions, ImageBackground } from 'react-native';
+import { MapPin, Plus, Heart, Search, Filter, Star, Bell, User, ChevronRight, ArrowRight, Clock, Truck, Leaf, Percent } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../context/AppContext';
 import { SCREEN_NAMES } from '../types';
@@ -8,6 +8,8 @@ import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width - 32;
+const BANNER_GAP = 16;
+const BANNER_TOTAL_WIDTH = BANNER_WIDTH + BANNER_GAP;
 
 const FarmFerryHome = () => {
   const navigation = useNavigation();
@@ -34,7 +36,7 @@ const FarmFerryHome = () => {
     { name: 'Dry Fruits', image: require('../../assets/images/dryfruits.jpg') },
   ];
 
-  const farmers = [
+const farmers = [
     {
       name: 'Rajesh Kumar',
       farm: 'Green Valley Farm',
@@ -61,7 +63,7 @@ const FarmFerryHome = () => {
     },
   ];
 
-  const featuredProducts = [
+const featuredProducts = [
     {
       id: 1,
       name: 'Organic Tomatoes',
@@ -112,7 +114,7 @@ const FarmFerryHome = () => {
     },
   ];
 
-  const banners = [
+ const banners = [
     {
       id: 1,
       title: 'Free Delivery',
@@ -156,7 +158,7 @@ const FarmFerryHome = () => {
       setCurrentBanner((prev) => {
         const nextIndex = (prev + 1) % banners.length;
         scrollViewRef.current?.scrollTo({
-          x: nextIndex * BANNER_WIDTH,
+          x: nextIndex * BANNER_TOTAL_WIDTH,
           animated: true,
         });
         return nextIndex;
@@ -182,7 +184,7 @@ const FarmFerryHome = () => {
 
   const handleBannerScroll = (event) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
-    const index = Math.round(scrollPosition / BANNER_WIDTH);
+    const index = Math.round(scrollPosition / BANNER_TOTAL_WIDTH);
     setCurrentBanner(index);
   };
 
@@ -204,8 +206,12 @@ const FarmFerryHome = () => {
   const renderBanner = (banner) => (
     <Animated.View
       key={banner.id}
-      style={{ width: BANNER_WIDTH, opacity: fadeAnim }}
-      className="rounded-3xl mr-4 overflow-hidden opacity-50"
+      style={{ 
+        width: BANNER_WIDTH,
+        marginRight: banners[banners.length - 1].id === banner.id ? 0 : BANNER_GAP,
+        opacity: fadeAnim,
+      }}
+      className="rounded-3xl overflow-hidden"
     >
       <ImageBackground
         source={banner.image}
@@ -222,25 +228,21 @@ const FarmFerryHome = () => {
           backgroundColor: 'rgba(100, 100, 100, 0.5)',
           borderRadius: 24
         }} />
-        {/* Blur the entire background */}
         <BlurView
-          intensity={40}  // Adjust blur strength (0-100)
-          tint="light"    // "light", "dark", or "default"
+          intensity={40}
+          tint="light"
           style={{
             flex: 1,
             borderRadius: 24,
             padding: 20,
           }}
         >
-          {/* Top-right tag (now inside BlurView) */}
           <View className="absolute top-4 right-4 px-3 py-1 rounded-full bg-white z-10">
             <Text className="text-green-700 text-xs font-bold">{banner.tag}</Text>
           </View>
 
-          {/* Content container (pushes text to bottom) */}
           <View style={{ flex: 1 }} />
 
-          {/* Bottom text section (same as before) */}
           <View>
             <View className="flex-row items-center mb-2">
               {banner.icon}
@@ -274,12 +276,11 @@ const FarmFerryHome = () => {
     </Animated.View>
   );
 
-
   return (
-    <SafeAreaView className="flex-1 bg-grey-100">
+    <SafeAreaView className="flex-1 bg-gray-200">
       <View className="flex-1">
         {/* App Bar */}
-        <View className="bg-white mt-6 px-4 py-4  flex-row justify-between items-center border-b border-green-200">
+        <View className="bg-white mt-3 px-4 py-4 flex-row justify-between items-center border-b border-green-200">
           <View className="flex-row items-center space-x-2">
             <View className="w-8 h-8 bg-green-500 rounded-full items-center justify-center">
               <Text className="text-white font-bold">F</Text>
@@ -305,7 +306,7 @@ const FarmFerryHome = () => {
 
         {/* Search Bar */}
         <View className="px-4 py-2">
-          <View className="bg-white flex-row items-center px-4 py-3 rounded-2xl border border-green-100">
+          <View className="bg-white flex-row items-center px-4 py-2 rounded-2xl border border-green-100">
             <Search size={20} color="#22c55e" />
             <TextInput
               placeholder="Search fresh produce, grains..."
@@ -330,27 +331,34 @@ const FarmFerryHome = () => {
                     {cat.name}
                   </Text>
                 </View>
-
               ))}
             </ScrollView>
           </View>
 
           {/* Enhanced Banner Section */}
           <View className="px-4 mt-4">
-            {/* Banner Carousel */}
-            <ScrollView
-              ref={scrollViewRef}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              onMomentumScrollEnd={handleBannerScroll}
-              scrollEventThrottle={16}
-              className="mb-4"
-            >
-              {banners.map(renderBanner)}
-            </ScrollView>
+            <View className="mb-4" style={{ 
+              width: BANNER_TOTAL_WIDTH,
+              marginLeft: -BANNER_GAP/2,
+            }}>
+              <ScrollView
+                ref={scrollViewRef}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onMomentumScrollEnd={handleBannerScroll}
+                scrollEventThrottle={16}
+                contentContainerStyle={{
+                  paddingHorizontal: BANNER_GAP/2,
+                }}
+                snapToInterval={BANNER_TOTAL_WIDTH}
+                decelerationRate="fast"
+                snapToAlignment="center"
+              >
+                {banners.map(renderBanner)}
+              </ScrollView>
+            </View>
 
-            {/* Pagination Dots */}
             <View className="flex-row justify-center items-center space-x-2 mb-2">
               {banners.map((_, index) => (
                 <TouchableOpacity
@@ -358,17 +366,15 @@ const FarmFerryHome = () => {
                   onPress={() => {
                     setCurrentBanner(index);
                     scrollViewRef.current?.scrollTo({
-                      x: index * BANNER_WIDTH,
+                      x: index * BANNER_TOTAL_WIDTH,
                       animated: true,
                     });
                   }}
-                  className={`w-2 h-2 rounded-full ${index === currentBanner ? 'bg-green-500' : 'bg-gray-300'
-                    }`}
+                  className={`w-2 h-2 rounded-full ${index === currentBanner ? 'bg-green-500' : 'bg-gray-300'}`}
                 />
               ))}
             </View>
 
-            {/* Quick Action Cards */}
             <View className="flex-row justify-between mt-2">
               <TouchableOpacity className="bg-green-50 border border-green-200 rounded-xl p-3 flex-1 mr-2 flex-row items-center">
                 <View className="w-8 h-8 bg-green-500 rounded-full items-center justify-center mr-2">
@@ -405,7 +411,15 @@ const FarmFerryHome = () => {
               {farmers.map((farmer, idx) => (
                 <View
                   key={idx}
-                  className="bg-white border border-green-100 rounded-2xl p-3 mr-3 w-40"
+                  className="bg-white rounded-2xl p-3 mr-3 w-40"
+                  style={{
+                    shadowColor: '#4b5563',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 6,
+                    elevation: 5,
+                    backgroundColor: 'white',
+                  }}
                 >
                   <Image
                     source={farmer.image}
@@ -434,7 +448,15 @@ const FarmFerryHome = () => {
                 <TouchableOpacity
                   key={product.id}
                   onPress={() => navigation.navigate(SCREEN_NAMES.PRODUCT_DETAILS, { product })}
-                  className="bg-white w-[48%] rounded-2xl mb-4 border border-green-100"
+                  className="w-[48%] rounded-2xl mb-4"
+                  style={{
+                    shadowColor: '#4b5563',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 6,
+                    elevation: 5,
+                    backgroundColor: 'white',
+                  }}
                 >
                   <View className="relative p-3 items-center">
                     {product.discount && (
