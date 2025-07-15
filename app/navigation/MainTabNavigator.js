@@ -1,20 +1,18 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// import FarmFerryHome from '../screens/FarmFerryHome';
-import HomeScreen from '../screens/HomeScreen';
-import FarmFerryHome from '../screens/HomeScreen';
+import HomeScreen from '../screens/HomeScreen'; // or FarmFerryHome
 import CartScreen from '../screens/CartScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import WishlistScreen from '../screens/WishlistScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import {ShoppingCart,Package,Heart,User,Home,Truck} from 'lucide-react-native';
+import { ShoppingCart, Package, Heart, User, Home, Truck } from 'lucide-react-native';
 import { useAppContext } from '../context/AppContext';
 
 const Tab = createBottomTabNavigator();
 
 export default function MainTabNavigator() {
-  const { cartCount, wishlistCount } = useAppContext(); // ✅ Get counts from context
+  const { cartItems, wishlistItems } = useAppContext(); // ✅ use actual context arrays
 
   const renderIcon = (Icon, focused, badge) => (
     <View className="items-center relative">
@@ -31,32 +29,35 @@ export default function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderTopColor: '#d1fae5',
-          height: 85,
-        },
+        tabBarActiveTintColor: '#16a34a', // ✅ Tailwind green-600
+        tabBarInactiveTintColor: '#9ca3af', // gray-400 (optional)
         tabBarLabelStyle: {
           fontSize: 12,
-          marginBottom: 5,
+          fontWeight: '600',
+        },
+        tabBarStyle: {
+          backgroundColor: '#ffffff',
+          borderTopWidth: 1,
+          borderTopColor: '#e5e7eb',
+          height: 60,
+          paddingBottom: 6,
         },
       }}
     >
       <Tab.Screen
         name="Home"
-        component={FarmFerryHome}
+        component={HomeScreen} // or FarmFerryHome
         options={{
           tabBarIcon: ({ focused }) => renderIcon(Home, focused, 0),
-          tabBarLabel: 'Home'
+          tabBarLabel: 'Home',
         }}
       />
       <Tab.Screen
         name="Cart"
         component={CartScreen}
         options={{
-          tabBarIcon: ({ focused }) => renderIcon(ShoppingCart, focused, cartCount),
-          tabBarLabel: 'Cart'
+          tabBarIcon: ({ focused }) => renderIcon(ShoppingCart, focused, cartItems.length),
+          tabBarLabel: 'Cart',
         }}
       />
       <Tab.Screen
@@ -64,15 +65,15 @@ export default function MainTabNavigator() {
         component={OrdersScreen}
         options={{
           tabBarIcon: ({ focused }) => renderIcon(Truck, focused, 0),
-          tabBarLabel: 'Orders'
+          tabBarLabel: 'Orders',
         }}
       />
       <Tab.Screen
         name="Wishlist"
         component={WishlistScreen}
         options={{
-          tabBarIcon: ({ focused }) => renderIcon(Heart, focused, wishlistCount),
-          tabBarLabel: 'Wishlist'
+          tabBarIcon: ({ focused }) => renderIcon(Heart, focused, wishlistItems.length),
+          tabBarLabel: 'Wishlist',
         }}
       />
       <Tab.Screen
@@ -80,7 +81,7 @@ export default function MainTabNavigator() {
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused }) => renderIcon(User, focused, 0),
-          tabBarLabel: 'Profile'
+          tabBarLabel: 'Profile',
         }}
       />
     </Tab.Navigator>
