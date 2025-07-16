@@ -1,7 +1,27 @@
 import React from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
-import { ArrowLeft, Minus, Plus, Heart, ChevronRight, Tag, MapPin, Clock, Star, Trash2 } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+} from 'react-native';
+import {
+  Minus,
+  Plus,
+  Heart,
+  ChevronRight,
+  Tag,
+  MapPin,
+  Clock,
+  Star,
+  Trash2,
+} from 'lucide-react-native';
 import { useAppContext } from '../context/AppContext';
+import AppBar from '../components/ui/AppBar';
 
 export default function CartScreen({ navigation }) {
   const { cartItems, updateCartItems } = useAppContext();
@@ -13,10 +33,12 @@ export default function CartScreen({ navigation }) {
       price: 35,
       originalPrice: 45,
       weight: '1 kg',
-      image: { uri: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=200&h=200&fit=crop' },
+      image: {
+        uri: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=200&h=200&fit=crop',
+      },
       discount: '22%',
       rating: 4.3,
-      deliveryTime: '30 min'
+      deliveryTime: '30 min',
     },
     {
       id: 102,
@@ -24,10 +46,12 @@ export default function CartScreen({ navigation }) {
       price: 120,
       originalPrice: 150,
       weight: '500 g',
-      image: { uri: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=200&h=200&fit=crop' },
+      image: {
+        uri: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=200&h=200&fit=crop',
+      },
       discount: '20%',
       rating: 4.5,
-      deliveryTime: '45 min'
+      deliveryTime: '45 min',
     },
     {
       id: 103,
@@ -35,10 +59,12 @@ export default function CartScreen({ navigation }) {
       price: 90,
       originalPrice: 120,
       weight: '3 pcs',
-      image: { uri: 'https://foodcare.in/cdn/shop/files/gps_generated_88352e72-bd4f-40c1-90b5-d33093d38d3e.png?v=1751017345&width=1445' },
+      image: {
+        uri: 'https://foodcare.in/cdn/shop/files/gps_generated_88352e72-bd4f-40c1-90b5-d33093d38d3e.png?v=1751017345&width=1445',
+      },
       discount: '25%',
       rating: 4.6,
-      deliveryTime: '40 min'
+      deliveryTime: '40 min',
     },
     {
       id: 104,
@@ -46,10 +72,12 @@ export default function CartScreen({ navigation }) {
       price: 60,
       originalPrice: 80,
       weight: '250 g',
-      image: { uri: 'https://images.immediate.co.uk/production/volatile/sites/10/2018/02/138d469d-4399-4a4d-b3f5-a6d40d1139d1-122e378.jpg' },
+      image: {
+        uri: 'https://images.immediate.co.uk/production/volatile/sites/10/2018/02/138d469d-4399-4a4d-b3f5-a6d40d1139d1-122e378.jpg',
+      },
       discount: '25%',
       rating: 4.4,
-      deliveryTime: '35 min'
+      deliveryTime: '35 min',
     },
     {
       id: 105,
@@ -57,13 +85,13 @@ export default function CartScreen({ navigation }) {
       price: 110,
       originalPrice: 140,
       weight: '500 g',
-      image: { uri: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=200&h=200&fit=crop' },
+      image: {
+        uri: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=200&h=200&fit=crop',
+      },
       discount: '21%',
       rating: 4.7,
-      deliveryTime: '50 min'
-    }
-
-    
+      deliveryTime: '50 min',
+    },
   ];
 
   const frequentlyBoughtProducts = [
@@ -73,10 +101,12 @@ export default function CartScreen({ navigation }) {
       price: 50,
       originalPrice: 60,
       weight: '1 L',
-      image: { uri: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=200&h=200&fit=crop' },
+      image: {
+        uri: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=200&h=200&fit=crop',
+      },
       discount: '17%',
       rating: 4.2,
-      deliveryTime: '20 min'
+      deliveryTime: '20 min',
     },
     {
       id: 202,
@@ -84,10 +114,12 @@ export default function CartScreen({ navigation }) {
       price: 80,
       originalPrice: 90,
       weight: '6 pcs',
-      image: { uri: 'https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=200&h=200&fit=crop' },
+      image: {
+        uri: 'https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=200&h=200&fit=crop',
+      },
       discount: '11%',
       rating: 4.4,
-      deliveryTime: '25 min'
+      deliveryTime: '25 min',
     },
     {
       id: 203,
@@ -95,10 +127,12 @@ export default function CartScreen({ navigation }) {
       price: 45,
       originalPrice: 55,
       weight: '400 g',
-      image: { uri: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop' },
+      image: {
+        uri: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop',
+      },
       discount: '18%',
       rating: 4.3,
-      deliveryTime: '30 min'
+      deliveryTime: '30 min',
     },
     {
       id: 204,
@@ -106,10 +140,12 @@ export default function CartScreen({ navigation }) {
       price: 65,
       originalPrice: 75,
       weight: '200 g',
-      image: { uri: 'https://www.mygreekdish.com/wp-content/uploads/2023/08/Greek-Yogurt-recipe-How-to-make-homemade-Greek-Yogurt.jpeg' },
+      image: {
+        uri: 'https://www.mygreekdish.com/wp-content/uploads/2023/08/Greek-Yogurt-recipe-How-to-make-homemade-Greek-Yogurt.jpeg',
+      },
       discount: '13%',
       rating: 4.5,
-      deliveryTime: '25 min'
+      deliveryTime: '25 min',
     },
     {
       id: 205,
@@ -117,23 +153,24 @@ export default function CartScreen({ navigation }) {
       price: 220,
       originalPrice: 250,
       weight: '300 g',
-      image: { uri: 'https://images.unsplash.com/photo-1612528443702-f6741f70a049?w=200&h=200&fit=crop' },
+      image: {
+        uri: 'https://images.unsplash.com/photo-1612528443702-f6741f70a049?w=200&h=200&fit=crop',
+      },
       discount: '12%',
       rating: 4.8,
-      deliveryTime: '45 min'
-    }
-
+      deliveryTime: '45 min',
+    },
   ];
 
   const increaseQty = (id) => {
-    const updated = cartItems.map(item =>
+    const updated = cartItems.map((item) =>
       item.id === id ? { ...item, quantity: item.quantity + 1 } : item
     );
     updateCartItems(updated);
   };
 
   const decreaseQty = (id) => {
-    const updated = cartItems.map(item =>
+    const updated = cartItems.map((item) =>
       item.id === id && item.quantity > 1
         ? { ...item, quantity: item.quantity - 1 }
         : item
@@ -142,12 +179,12 @@ export default function CartScreen({ navigation }) {
   };
 
   const removeFromCart = (id) => {
-    const updated = cartItems.filter(item => item.id !== id);
+    const updated = cartItems.filter((item) => item.id !== id);
     updateCartItems(updated);
   };
 
   const addToCart = (product) => {
-    const exists = cartItems.find(item => item.id === product.id);
+    const exists = cartItems.find((item) => item.id === product.id);
     if (exists) {
       increaseQty(product.id);
     } else {
@@ -168,11 +205,7 @@ export default function CartScreen({ navigation }) {
       style={{ width: 160 }}
     >
       <View className="relative w-full h-24 bg-green-50 rounded-xl mb-3 overflow-hidden">
-        <Image
-          source={product.image}
-          className="w-full h-full"
-          resizeMode="cover"
-        />
+        <Image source={product.image} className="w-full h-full" resizeMode="cover" />
         <View className="absolute top-1 left-1 bg-green-500 px-2 py-1 rounded-full">
           <Text className="text-white text-xs font-medium">{product.discount}</Text>
         </View>
@@ -180,10 +213,10 @@ export default function CartScreen({ navigation }) {
           <Heart size={12} color="#059669" />
         </TouchableOpacity>
       </View>
-
-      <Text className="text-sm font-semibold text-green-800 mb-1" numberOfLines={2}>{product.name}</Text>
+      <Text className="text-sm font-semibold text-green-800 mb-1" numberOfLines={2}>
+        {product.name}
+      </Text>
       <Text className="text-xs text-green-600 mb-2">{product.weight}</Text>
-
       <View className="flex-row items-center mb-2">
         <Star size={12} color="#F59E0B" fill="#F59E0B" />
         <Text className="text-xs text-gray-600 ml-1">{product.rating}</Text>
@@ -192,11 +225,12 @@ export default function CartScreen({ navigation }) {
           <Text className="text-xs text-green-600 ml-1">{product.deliveryTime}</Text>
         </View>
       </View>
-
       <View className="flex-row items-center justify-between">
         <View>
           <Text className="text-sm font-bold text-green-800">₹{product.price.toFixed(2)}</Text>
-          <Text className="text-xs text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</Text>
+          <Text className="text-xs text-gray-400 line-through">
+            ₹{product.originalPrice.toFixed(2)}
+          </Text>
         </View>
         <TouchableOpacity
           className="bg-green-500 w-8 h-8 rounded-full items-center justify-center"
@@ -210,24 +244,18 @@ export default function CartScreen({ navigation }) {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="bg-white px-4 py-4 flex-row items-center justify-between border-b border-green-100">
-        <View className="flex-row items-center">
-          <TouchableOpacity onPress={() => navigation.goBack()} className="mr-4">
-            <ArrowLeft size={24} color="#059669" />
-          </TouchableOpacity>
-          <Text className="text-lg font-semibold text-black-800">Cart</Text>
-          {cartItems.length > 0 && (
-            <Text className="text-sm text-green-600 ml-2">
-              {cartItems.length} item{cartItems.length > 1 ? 's' : ''}
-            </Text>
-          )}
-        </View>
-        <TouchableOpacity>
-          <Text className="text-black-600 text-2xl">🔍</Text>
-        </TouchableOpacity>
-      </View>
+      <StatusBar backgroundColor="white" barStyle="dark-content" />
 
+      {/* ✅ Custom AppBar with back arrow */}
+      <AppBar showBack={true} />
+
+      {/* ✅ Title under AppBar */}
+      <View className="px-4 mt-2 mb-1">
+        <Text className="text-2xl font-bold text-green-800">Cart</Text>
+        {cartItems.length > 0 && (
+          <Text className="text-sm text-green-600 mt-1">{cartItems.length} item(s)</Text>
+        )}
+      </View>
       {/* Location */}
       <View className="bg-white px-4 py-3 border-b border-green-100">
         <TouchableOpacity className="flex-row items-center">
@@ -381,15 +409,25 @@ export default function CartScreen({ navigation }) {
             </View>
           </View>
           <View className="px-4 py-4">
-            <TouchableOpacity
-              className="bg-green-500 rounded-2xl py-4 items-center shadow-sm"
-              onPress={() => navigation.navigate('PlaceOrder')}
-            >
-              <Text className="text-white font-semibold text-base">Proceed to Checkout</Text>
-            </TouchableOpacity>
-          </View>
+  <TouchableOpacity
+    onPress={() => navigation.navigate('PlaceOrder')}
+    activeOpacity={0.9}
+    className="rounded-2xl overflow-hidden shadow-sm"
+  >
+    <LinearGradient
+      colors={['#10b981', '#059669']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={{ paddingVertical: 16, borderRadius: 16, alignItems: 'center', justifyContent: 'center' }}
+    >
+      <Text className="text-white font-semibold text-base">Proceed to Checkout</Text>
+    </LinearGradient>
+  </TouchableOpacity>
+</View>
+
         </View>
       )}
+
     </SafeAreaView>
   );
 }

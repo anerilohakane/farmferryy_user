@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
+import AppBar from '../components/ui/AppBar';
 import {View,Text,Image,ScrollView,TouchableOpacity,TextInput,Dimensions,FlatList} from 'react-native';
 import {MapPin,Plus,Heart,Search as SearchIcon,Filter,Star,Bell,User,ChevronRight,ArrowRight,Clock,Truck,Leaf,Percent,ShoppingCart} from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { farmers } from '../components/ui/farmers';
 const { width } = Dimensions.get('window');
 const HomeScreen = ({navigation}) => {
@@ -265,7 +267,7 @@ const HomeScreen = ({navigation}) => {
     </View>
   );
 
-  const renderProductItem = ({ item }) => (
+ const renderProductItem = ({ item }) => (
   <TouchableOpacity 
     onPress={() => navigation.navigate('ProductDetails', { product: item })}
     activeOpacity={0.9}
@@ -307,27 +309,38 @@ const HomeScreen = ({navigation}) => {
         </View>
         <Text className="text-xs text-gray-500 mb-3">{item.reviews} reviews</Text>
         <TouchableOpacity
-          className={`flex-row justify-center items-center rounded-xl py-2.5 shadow-sm ${isInCart(item.id) ? 'bg-gray-100' : 'bg-green-500'}`}
+          className="overflow-hidden rounded-xl"
           onPress={(e) => {
             e.stopPropagation();
             handleAddToCart(item);
           }}
           disabled={isInCart(item.id)}
+          style={{
+            shadowColor: '#059669',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.15,
+            shadowRadius: 4,
+            elevation: 2,
+          }}
         >
           {isInCart(item.id) ? (
-            <Text className="text-gray-500 text-sm font-semibold">Added to Cart</Text>
+            <View className="py-2.5 flex-row items-center justify-center bg-gray-100 rounded-xl">
+              <Text className="text-gray-500 font-semibold text-sm">Added to Cart</Text>
+            </View>
           ) : (
-            <>
-              <Plus width={16} height={16} color="#fff" />
-              <Text className="text-white text-sm font-semibold ml-2">Add to Cart</Text>
-            </>
+            <LinearGradient
+              colors={['#10b981', '#059669']}
+              className="py-2.5 flex-row items-center justify-center rounded-xl"
+            >
+              <ShoppingCart width={14} height={14} color="#fff" />
+              <Text className="text-white font-semibold text-sm ml-1.5">Add to Cart</Text>
+            </LinearGradient>
           )}
         </TouchableOpacity>
       </View>
     </View>
   </TouchableOpacity>
 );
-
   const renderQuickAction = ({ item }) => {
     const Icon = item.icon;
     return (
@@ -346,93 +359,7 @@ const HomeScreen = ({navigation}) => {
   return (
     <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       {/* Header */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#e5e7eb', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 1 }} className="mt-10">
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: '#4b5563', justifyContent: 'center', alignItems: 'center', marginRight: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, overflow: 'hidden' }}>
-            <Image
-              source={{ uri: 'https://cdn.dribbble.com/userupload/13059119/file/original-b9ef38b6d36a6cdff474156872acdaaa.jpg?format=webp&resize=400x300&vertical=center' }}
-              style={{ width: '100%', height: '100%' }}
-              resizeMode="cover"
-            />
-          </View>
-          <View>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1f2937', marginLeft: '10' }}>FarmFerry</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <MapPin width={12} height={12} color="#16a34a" />
-              <Text style={{ fontSize: 12, color: '#16a34a', fontWeight: '500', marginLeft: 4 }}>Nagpur, Maharashtra</Text>
-            </View>
-          </View>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{
-            width: 48,
-            height: 48,
-            borderRadius: 14,
-            backgroundColor: '#f0fdf4',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginLeft: 12,
-            position: 'relative',
-            borderWidth: 1,
-            borderColor: '#dcfce7',
-          }}>
-            {cartItems.length > 0 && (
-              <View style={{
-                position: 'absolute',
-                top: -6,
-                right: -6,
-                width: 22,
-                height: 22,
-                borderRadius: 11,
-                backgroundColor: 'red',
-                justifyContent: 'center',
-                alignItems: 'center',
-                zIndex: 10,
-                borderWidth: 2,
-                borderColor: '#f0fdf4',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 2,
-                elevation: 2,
-              }}>
-                <Text style={{
-                  color: 'white',
-                  fontSize: 11,
-                  fontWeight: '800',
-                  textAlign: 'center',
-                  includeFontPadding: false,
-                }}>
-                  {cartItems.length}
-                </Text>
-              </View>
-            )}
-            <Bell
-              width={22}
-              height={22}
-              color="#16a34a"
-            />
-          </View>
-          <View style={{
-            width: 48,
-            height: 48,
-            borderRadius: 14,
-            backgroundColor: '#f0fdf4',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginLeft: 12,
-            position: 'relative',
-            borderWidth: 1,
-            borderColor: '#dcfce7',
-          }}>
-            <User
-              width={22}
-              height={22}
-              color="#16a34a"
-            />
-          </View>
-        </View>
-      </View>
+      <AppBar />
 
       {/* Search Bar */}
       <View style={{ padding: 16 }}>
@@ -571,3 +498,18 @@ const HomeScreen = ({navigation}) => {
 };
 
 export default HomeScreen;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
