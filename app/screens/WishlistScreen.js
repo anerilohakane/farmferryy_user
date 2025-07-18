@@ -19,9 +19,6 @@ import {
   Heart,
   Package,
   Sparkles,
-  MapPin,
-  Bell,
-  User,
   ArrowLeft,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -251,48 +248,25 @@ export default function WishlistScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
 
-      {/* AppBar (Same as HomeScreen with Back Arrow) */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white">
-        {/* Back */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="p-2 bg-green-50 rounded-full"
-        >
-          <ArrowLeft size={20} color="#15803d" />
+      {/* ✅ AppBar with white background and black content */}
+      <View className="flex-row items-center px-4 py-3 bg-white border-b border-gray-200">
+        <TouchableOpacity onPress={() => navigation.goBack()} className="p-2 mr-2">
+          <ArrowLeft size={22} color="black" />
         </TouchableOpacity>
-
-        {/* App Title */}
-        <View className="flex-1 ml-4">
-          <Text className="text-xl font-bold text-emerald-700">FarmFerry</Text>
-          <View className="flex-row items-center">
-            <MapPin size={14} color="#15803d" />
-            <Text className="text-xs text-gray-600 ml-1">Deliver to Home</Text>
-          </View>
-        </View>
-
-        {/* Right Icons */}
-        <View className="flex-row items-center space-x-3">
-          <View className="relative">
-            <Bell size={22} color="#15803d" />
-            <View className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500" />
-          </View>
-          <TouchableOpacity className="w-8 h-8 rounded-full bg-green-50 items-center justify-center">
-            <User size={18} color="#15803d" />
-          </TouchableOpacity>
-        </View>
+        <Text className="text-xl font-bold text-black">My Wishlist</Text>
       </View>
 
       {/* Page Title */}
       <View className="px-4 mt-2 mb-3">
-        <Text className="text-2xl font-bold text-gray-900">My Wishlist</Text>
+        <Text className="text-2xl font-bold text-gray-900">Saved Items</Text>
         <Text className="text-gray-500 text-sm mt-0.5">
           {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved
         </Text>
       </View>
 
-      {/* Product Grid */}
+      {/* Wishlist Items */}
       <View className="flex-1 px-4">
         {wishlistItems.length > 0 ? (
           <FlatList

@@ -1,5 +1,7 @@
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ArrowLeft } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -8,6 +10,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import {
   Minus,
@@ -21,10 +24,16 @@ import {
   Trash2,
 } from 'lucide-react-native';
 import { useAppContext } from '../context/AppContext';
-import AppBar from '../components/ui/AppBar';
 
 export default function CartScreen({ navigation }) {
-  const { cartItems, updateCartItems } = useAppContext();
+  const {
+    cartItems,
+    updateCartItems,
+    addToCart,
+    wishlistItems,
+    addToWishlist,
+    removeFromWishlist,
+  } = useAppContext();
 
   const recommendedProducts = [
     {
@@ -42,55 +51,16 @@ export default function CartScreen({ navigation }) {
     },
     {
       id: 102,
-      name: 'Fresh Strawberries',
-      price: 120,
-      originalPrice: 150,
-      weight: '500 g',
-      image: {
-        uri: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=200&h=200&fit=crop',
-      },
-      discount: '20%',
-      rating: 4.5,
-      deliveryTime: '45 min',
-    },
-    {
-      id: 103,
-      name: 'Avocados',
-      price: 90,
-      originalPrice: 120,
-      weight: '3 pcs',
-      image: {
-        uri: 'https://foodcare.in/cdn/shop/files/gps_generated_88352e72-bd4f-40c1-90b5-d33093d38d3e.png?v=1751017345&width=1445',
-      },
-      discount: '25%',
-      rating: 4.6,
-      deliveryTime: '40 min',
-    },
-    {
-      id: 104,
       name: 'Cherry Tomatoes',
       price: 60,
       originalPrice: 80,
-      weight: '250 g',
-      image: {
-        uri: 'https://images.immediate.co.uk/production/volatile/sites/10/2018/02/138d469d-4399-4a4d-b3f5-a6d40d1139d1-122e378.jpg',
-      },
-      discount: '25%',
-      rating: 4.4,
-      deliveryTime: '35 min',
-    },
-    {
-      id: 105,
-      name: 'Green Grapes',
-      price: 110,
-      originalPrice: 140,
       weight: '500 g',
       image: {
-        uri: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=200&h=200&fit=crop',
+        uri: 'https://images.unsplash.com/photo-1582515073490-39981397c445?w=200&h=200&fit=crop',
       },
-      discount: '21%',
-      rating: 4.7,
-      deliveryTime: '50 min',
+      discount: '25%',
+      rating: 4.5,
+      deliveryTime: '25 min',
     },
   ];
 
@@ -110,55 +80,16 @@ export default function CartScreen({ navigation }) {
     },
     {
       id: 202,
-      name: 'Farm Eggs',
-      price: 80,
-      originalPrice: 90,
-      weight: '6 pcs',
-      image: {
-        uri: 'https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=200&h=200&fit=crop',
-      },
-      discount: '11%',
-      rating: 4.4,
-      deliveryTime: '25 min',
-    },
-    {
-      id: 203,
-      name: 'Whole Wheat Bread',
-      price: 45,
+      name: 'Brown Bread',
+      price: 40,
       originalPrice: 55,
       weight: '400 g',
       image: {
-        uri: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop',
+        uri: 'https://images.unsplash.com/photo-1604908554165-910cf4b84076?w=200&h=200&fit=crop',
       },
-      discount: '18%',
-      rating: 4.3,
-      deliveryTime: '30 min',
-    },
-    {
-      id: 204,
-      name: 'Greek Yogurt',
-      price: 65,
-      originalPrice: 75,
-      weight: '200 g',
-      image: {
-        uri: 'https://www.mygreekdish.com/wp-content/uploads/2023/08/Greek-Yogurt-recipe-How-to-make-homemade-Greek-Yogurt.jpeg',
-      },
-      discount: '13%',
-      rating: 4.5,
-      deliveryTime: '25 min',
-    },
-    {
-      id: 205,
-      name: 'Almond Butter',
-      price: 220,
-      originalPrice: 250,
-      weight: '300 g',
-      image: {
-        uri: 'https://images.unsplash.com/photo-1612528443702-f6741f70a049?w=200&h=200&fit=crop',
-      },
-      discount: '12%',
-      rating: 4.8,
-      deliveryTime: '45 min',
+      discount: '27%',
+      rating: 4.6,
+      deliveryTime: '15 min',
     },
   ];
 
@@ -183,20 +114,70 @@ export default function CartScreen({ navigation }) {
     updateCartItems(updated);
   };
 
-  const addToCart = (product) => {
-    const exists = cartItems.find((item) => item.id === product.id);
-    if (exists) {
-      increaseQty(product.id);
+  const toggleWishlist = (product) => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      Alert.alert('Removed from Wishlist', `${product.name} has been removed from your wishlist`);
     } else {
-      updateCartItems([...cartItems, { ...product, quantity: 1 }]);
+      addToWishlist({ ...product, image: product.image.uri });
+      Alert.alert('Added to Wishlist', `${product.name} has been added to your wishlist`);
     }
   };
 
+  const isInWishlist = (id) => {
+    return wishlistItems.some((item) => item.id === id);
+  };
+
+  const moveToWishlist = (product) => {
+    if (!isInWishlist(product.id)) {
+      addToWishlist(product);
+    }
+    removeFromCart(product.id);
+    Alert.alert('Moved to Wishlist', `${product.name} has been moved to your wishlist`);
+  };
+
+  const handleAddRecommended = (product) => {
+    const existingItem = cartItems.find((item) => item.id === product.id);
+    const productToAdd = { ...product, quantity: 1, image: product.image.uri };
+
+    if (existingItem) {
+      increaseQty(existingItem.id);
+    } else {
+      addToCart(productToAdd);
+    }
+
+    Alert.alert('Added to Cart', `${product.name} has been added to your cart`);
+  };
+
+  const handlePromoCode = () => navigation.navigate('PromoCode');
+
+  const handleViewAllRecommended = () => {
+    navigation.navigate('RecommendedProducts', {
+      products: recommendedProducts,
+      title: 'Fresh Picks for You',
+    });
+  };
+
+  const handleViewAllFrequentlyBought = () => {
+    navigation.navigate('RecommendedProducts', {
+      products: frequentlyBoughtProducts,
+      title: 'Frequently Bought Together',
+    });
+  };
+
+  const handleChangeAddress = () => navigation.navigate('SelectAddress');
+
   const getSubtotal = () =>
     cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
   const getShipping = () => 4.0;
   const getTotal = () => getSubtotal() + getShipping();
+  const getSavings = () =>
+    cartItems.reduce((sum, item) => {
+      if (item.originalPrice) {
+        return sum + (item.originalPrice - item.price) * item.quantity;
+      }
+      return sum;
+    }, 0);
 
   const renderRecommendedProduct = (product) => (
     <View
@@ -205,12 +186,19 @@ export default function CartScreen({ navigation }) {
       style={{ width: 160 }}
     >
       <View className="relative w-full h-24 bg-green-50 rounded-xl mb-3 overflow-hidden">
-        <Image source={product.image} className="w-full h-full" resizeMode="cover" />
+        <Image source={{ uri: product.image.uri }} className="w-full h-full" resizeMode="cover" />
         <View className="absolute top-1 left-1 bg-green-500 px-2 py-1 rounded-full">
           <Text className="text-white text-xs font-medium">{product.discount}</Text>
         </View>
-        <TouchableOpacity className="absolute top-1 right-1 w-6 h-6 bg-white rounded-full items-center justify-center shadow-sm">
-          <Heart size={12} color="#059669" />
+        <TouchableOpacity
+          className="absolute top-1 right-1 w-6 h-6 bg-white rounded-full items-center justify-center shadow-sm"
+          onPress={() => toggleWishlist(product)}
+        >
+          <Heart
+            size={12}
+            color={isInWishlist(product.id) ? 'red' : '#059669'}
+            fill={isInWishlist(product.id) ? 'red' : 'none'}
+          />
         </TouchableOpacity>
       </View>
       <Text className="text-sm font-semibold text-green-800 mb-1" numberOfLines={2}>
@@ -228,43 +216,38 @@ export default function CartScreen({ navigation }) {
       <View className="flex-row items-center justify-between">
         <View>
           <Text className="text-sm font-bold text-green-800">₹{product.price.toFixed(2)}</Text>
-          <Text className="text-xs text-gray-400 line-through">
-            ₹{product.originalPrice.toFixed(2)}
-          </Text>
+          <Text className="text-xs text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</Text>
         </View>
         <TouchableOpacity
           className="bg-green-500 w-8 h-8 rounded-full items-center justify-center"
-          onPress={() => addToCart(product)}
+          onPress={() => handleAddRecommended(product)}
         >
           <Plus size={14} color="white" />
         </TouchableOpacity>
       </View>
     </View>
   );
-
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <StatusBar backgroundColor="white" barStyle="dark-content" />
 
-      {/* ✅ Custom AppBar with back arrow */}
-      <AppBar showBack={true} />
-
-      {/* ✅ Title under AppBar */}
-      <View className="px-4 mt-2 mb-1">
-        <Text className="text-2xl font-bold text-green-800">Cart</Text>
-        {cartItems.length > 0 && (
-          <Text className="text-sm text-green-600 mt-1">{cartItems.length} item(s)</Text>
-        )}
+      {/* AppBar with back arrow */}
+      <View className="flex-row items-center px-4 py-3 bg-white border-b border-gray-200">
+        <TouchableOpacity onPress={() => navigation.goBack()} className="mr-3">
+          <ArrowLeft size={24} color="black" />
+        </TouchableOpacity>
+        <Text className="text-lg text-black font-medium">Cart</Text>
       </View>
-      {/* Location */}
+
+      {/* Deliver to block just below AppBar */}
       <View className="bg-white px-4 py-3 border-b border-green-100">
-        <TouchableOpacity className="flex-row items-center">
+        <TouchableOpacity className="flex-row items-center" onPress={handleChangeAddress}>
           <MapPin size={16} color="#059669" />
-          <Text className="text-sm text-black-700 ml-2">Deliver to </Text>
-          <Text className="text-sm font-semibold text-black-800">Selected Location</Text>
+          <Text className="text-sm text-black ml-2">Deliver to </Text>
+          <Text className="text-sm font-semibold text-black">Selected Location</Text>
           <ChevronRight size={14} color="#059669" className="ml-1" />
         </TouchableOpacity>
-        <Text className="text-xs text-grey-600 mt-1 ml-6">Mokarwadi, Pune - 411046</Text>
+        <Text className="text-xs text-gray-500 mt-1 ml-6">Mokarwadi, Pune - 411046</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
@@ -278,7 +261,7 @@ export default function CartScreen({ navigation }) {
           </View>
         ) : (
           <>
-            {/* Delivery Time */}
+            {/* Delivery Summary */}
             <View className="bg-white mx-4 mt-4 rounded-2xl p-4 border border-green-100">
               <View className="flex-row items-center justify-between">
                 <View>
@@ -296,12 +279,22 @@ export default function CartScreen({ navigation }) {
             {/* Cart Items */}
             <View className="px-4 pt-4">
               {cartItems.map((item) => (
-                <View key={item.id} className="bg-white rounded-2xl mb-4 p-4 shadow-sm border border-green-100">
+                <View
+                  key={item.id}
+                  className="bg-white rounded-2xl mb-4 p-4 shadow-sm border border-gray-200"
+                  style={{
+                    shadowColor: '#6b7280', // Tailwind gray-500
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 6,
+                    elevation: 4,
+                  }}
+                >
                   <View className="flex-row items-start">
-                    <View className="w-24 h-24 bg-green-50 border border-green-200 rounded-xl items-center justify-center mr-3 self-center overflow-hidden">
-                      <Image 
-                        source={{ uri: item.image }} 
-                        className="w-full h-full" 
+                    <View className="w-24 h-24 bg-green-50 border border-gray-200 rounded-xl items-center justify-center mr-3 self-center overflow-hidden">
+                      <Image
+                        source={{ uri: item.image }}
+                        className="w-full h-full"
                         resizeMode="contain"
                       />
                     </View>
@@ -314,22 +307,26 @@ export default function CartScreen({ navigation }) {
                       </View>
                       <Text className="text-sm text-green-600 mb-1">{item.unit || '500 g'}</Text>
                       <View className="flex-row items-center mb-3">
-                        <Text className="text-lg font-bold text-green-800">₹{(item.price * item.quantity).toFixed(2)}</Text>
+                        <Text className="text-lg font-bold text-green-800">
+                          ₹{(item.price * item.quantity).toFixed(2)}
+                        </Text>
                         {item.originalPrice && (
-                          <Text className="text-sm text-gray-400 line-through ml-2">₹{item.originalPrice}</Text>
+                          <Text className="text-sm text-gray-400 line-through ml-2">
+                            ₹{item.originalPrice}
+                          </Text>
                         )}
                       </View>
                       <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center bg-green-50 rounded-full px-1 py-1">
-                          <TouchableOpacity 
-                            onPress={() => decreaseQty(item.id)} 
+                          <TouchableOpacity
+                            onPress={() => decreaseQty(item.id)}
                             className="w-8 h-8 rounded-full bg-white items-center justify-center shadow-sm border border-green-100"
                           >
                             <Minus size={14} color="#059669" />
                           </TouchableOpacity>
-                          <Text className="mx-4 font-medium text-green-700 min-w-[20px] text-center">{item.quantity}</Text>
-                          <TouchableOpacity 
-                            onPress={() => increaseQty(item.id)} 
+                          <Text className="mx-4 font-medium text-green-700">{item.quantity}</Text>
+                          <TouchableOpacity
+                            onPress={() => increaseQty(item.id)}
                             className="w-8 h-8 rounded-full bg-white items-center justify-center shadow-sm border border-green-100"
                           >
                             <Plus size={14} color="#059669" />
@@ -342,8 +339,15 @@ export default function CartScreen({ navigation }) {
                       </View>
                     </View>
                   </View>
-                  <TouchableOpacity className="flex-row items-center mt-3 pt-3 border-t border-green-100">
-                    <Heart size={16} color="#059669" />
+                  <TouchableOpacity
+                    className="flex-row items-center mt-3 pt-3 border-t border-green-100"
+                    onPress={() => moveToWishlist(item)}
+                  >
+                    <Heart
+                      size={16}
+                      color={isInWishlist(item.id) ? "red" : "#059669"}
+                      fill={isInWishlist(item.id) ? "red" : "none"}
+                    />
                     <Text className="text-sm text-grey-600 ml-2">Move to wishlist</Text>
                   </TouchableOpacity>
                 </View>
@@ -354,7 +358,9 @@ export default function CartScreen({ navigation }) {
             <View className="mt-6">
               <View className="flex-row items-center justify-between px-4 mb-4">
                 <Text className="text-lg font-semibold text-grey-900">Fresh picks for you</Text>
-                <ChevronRight size={20} color="#059669" />
+                <TouchableOpacity onPress={handleViewAllRecommended}>
+                  <ChevronRight size={20} color="#059669" />
+                </TouchableOpacity>
               </View>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-4">
                 {recommendedProducts.map(renderRecommendedProduct)}
@@ -365,16 +371,21 @@ export default function CartScreen({ navigation }) {
             <View className="mt-6">
               <View className="flex-row items-center justify-between px-4 mb-4">
                 <Text className="text-lg font-semibold text-grey-900">Frequently bought together</Text>
-                <ChevronRight size={20} color="#059669" />
+                <TouchableOpacity onPress={handleViewAllFrequentlyBought}>
+                  <ChevronRight size={20} color="#059669" />
+                </TouchableOpacity>
               </View>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-4">
                 {frequentlyBoughtProducts.map(renderRecommendedProduct)}
               </ScrollView>
             </View>
 
-            {/* Promo Code */}
+            {/* Promo Code Section */}
             <View className="bg-white mx-4 mt-6 rounded-2xl p-4 shadow-sm border border-green-100">
-              <TouchableOpacity className="flex-row items-center justify-between">
+              <TouchableOpacity
+                className="flex-arow items-center justify-between"
+                onPress={handlePromoCode}
+              >
                 <View className="flex-row items-center">
                   <Tag size={20} color="#059669" />
                   <Text className="text-base text-grey-700 ml-3">Enter your promo code</Text>
@@ -388,46 +399,63 @@ export default function CartScreen({ navigation }) {
         )}
       </ScrollView>
 
-      {/* Checkout */}
+      {/* Checkout Bar */}
       {cartItems.length > 0 && (
         <View className="bg-white border-t border-green-100">
           <View className="px-4 py-3 border-b border-green-100">
             <View className="flex-row justify-between items-center mb-2">
               <Text className="text-sm text-green-700">Subtotal</Text>
-              <Text className="text-sm font-medium text-green-800">₹{getSubtotal().toFixed(2)}</Text>
+              <Text className="text-sm font-medium text-green-800">
+                ₹{getSubtotal().toFixed(2)}
+              </Text>
             </View>
             <View className="flex-row justify-between items-center mb-2">
               <Text className="text-sm text-green-700">Delivery</Text>
-              <Text className="text-sm font-medium text-green-800">₹{getShipping().toFixed(2)}</Text>
+              <Text className="text-sm font-medium text-green-800">
+                ₹{getShipping().toFixed(2)}
+              </Text>
             </View>
             <View className="flex-row justify-between items-center">
-              <Text className="text-base font-semibold text-black-800">Total: ₹{getTotal().toFixed(2)}</Text>
+              <Text className="text-base font-semibold text-black-800">
+                Total: ₹{getTotal().toFixed(2)}
+              </Text>
               <View className="flex-row items-center">
                 <Tag size={14} color="#059669" />
-                <Text className="text-sm text-black-600 ml-1">Saved ₹{(getSubtotal() * 0.1).toFixed(1)}</Text>
+                <Text className="text-sm text-black-600 ml-1">
+                  Saved ₹{getSavings().toFixed(2)}
+                </Text>
               </View>
             </View>
           </View>
           <View className="px-4 py-4">
-  <TouchableOpacity
-    onPress={() => navigation.navigate('PlaceOrder')}
-    activeOpacity={0.9}
-    className="rounded-2xl overflow-hidden shadow-sm"
-  >
-    <LinearGradient
-      colors={['#10b981', '#059669']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      style={{ paddingVertical: 16, borderRadius: 16, alignItems: 'center', justifyContent: 'center' }}
-    >
-      <Text className="text-white font-semibold text-base">Proceed to Checkout</Text>
-    </LinearGradient>
-  </TouchableOpacity>
-</View>
-
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Checkout', {
+                subtotal: getSubtotal(),
+                shipping: getShipping(),
+                total: getTotal(),
+                savings: getSavings(),
+                items: cartItems
+              })}
+              activeOpacity={0.9}
+              className="rounded-2xl overflow-hidden shadow-sm"
+            >
+              <LinearGradient
+                colors={['#10b981', '#059669']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  paddingVertical: 16,
+                  borderRadius: 16,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text className="text-white font-semibold text-base">Proceed to Checkout</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
-
     </SafeAreaView>
   );
 }

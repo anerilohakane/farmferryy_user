@@ -204,126 +204,50 @@ const ProfileScreen = () => {
   );
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="flex flex-row justify-between items-center p-4 bg-white border-b border-gray-200">
-        <View className="flex flex-row items-center">
-          <View className="w-8 h-8 rounded-full bg-green-600 items-center justify-center mr-3">
-            <User size={20} color="#ffffff" />
-          </View>
-          <View>
-            <Text className="text-lg font-bold text-gray-900">Profile</Text>
-            <Text className="text-xs text-gray-500">Manage your account</Text>
-          </View>
-        </View>
-        <View className="flex flex-row items-center gap-4">
-          <TouchableOpacity
-            className="relative p-2 rounded-lg"
-            onPress={() => setShowNotifications(!showNotifications)}
-          >
-            <Bell size={20} color="#4b5563" />
-            <View className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 items-center justify-center">
-              <Text className="text-white text-xs font-bold">2</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity className="p-2 rounded-lg">
-            <Search size={20} color="#4b5563" />
-          </TouchableOpacity>
-        </View>
+    <ScrollView className="flex-1 bg-gray-50 px-4 pt-6">
+      <Text className="text-2xl font-bold text-gray-800 mb-4">My Profile</Text>
+
+      <View className="bg-white rounded-2xl p-4 mb-6 border border-gray-100">
+        <Text className="text-lg font-semibold text-gray-800 mb-1">{user.name}</Text>
+        <Text className="text-sm text-gray-500">{user.email}</Text>
       </View>
 
-      {/* Profile Header */}
-      <View className="p-4 bg-white">
-        <View className="items-center">
-          <View className="relative mb-4">
-            <View className="w-16 h-16 rounded-2xl bg-green-600 items-center justify-center">
-              <User size={32} color="#ffffff" />
-            </View>
-            <TouchableOpacity className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white items-center justify-center border-2 border-gray-200">
-              <Edit3 size={14} color="#16a34a" />
-            </TouchableOpacity>
-          </View>
-          <View>
-            <Text className="text-lg font-bold text-gray-900 mb-1 text-center">Priya Sharma</Text>
-            <View className="flex flex-row items-center mb-1 justify-center">
-              <Phone size={12} color="#4b5563" />
-              <Text className="text-xs text-gray-500 ml-2">+91 98765 43210</Text>
-            </View>
-            <View className="flex flex-row items-center mb-1 justify-center">
-              <Mail size={12} color="#4b5563" />
-              <Text className="text-xs text-gray-500 ml-2">priya.sharma@gmail.com</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-
-      {/* Navigation Tabs */}
-      <View className="flex flex-row bg-white border-b border-gray-200">
-        {[
-          { key: 'profile', label: 'Profile', icon: User },
-          { key: 'orders', label: 'My Orders', icon: ShoppingBag },
-          { key: 'addresses', label: 'Addresses', icon: MapPin },
-        ].map(tab => (
-          <TouchableOpacity
-            key={tab.key}
-            className={`flex-1 flex flex-row items-center justify-center py-4 gap-2 ${
-              activeTab === tab.key ? 'border-b-2 border-green-600 bg-green-50' : ''
-            }`}
-            onPress={() => setActiveTab(tab.key)}
-          >
-            <tab.icon
-              size={16}
-              color={activeTab === tab.key ? '#16a34a' : '#6b7280'}
-            />
-            <Text className={`text-sm ${activeTab === tab.key ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Tab Content */}
-      <ScrollView className="flex-1 bg-white">
-        {activeTab === 'profile' && renderProfileTab()}
-        {activeTab === 'orders' && renderOrdersTab()}
-        {activeTab === 'addresses' && renderAddressesTab()}
-      </ScrollView>
-
-      {/* Notifications Modal */}
-      <Modal
-        visible={showNotifications}
-        animationType="slide"
-        onRequestClose={() => setShowNotifications(false)}
+      <TouchableOpacity
+        onPress={() => navigation.navigate('EditProfile', { user })}
+        className="flex-row items-center justify-between bg-white p-4 rounded-2xl mb-3 border border-gray-100"
       >
-        <View className="flex-1 bg-white">
-          <View className="p-4 border-b border-gray-200 flex flex-row justify-between items-center">
-            <Text className="text-lg font-semibold text-gray-900">Notifications</Text>
-            <TouchableOpacity
-              onPress={() => setShowNotifications(false)}
-              className="p-2 rounded-lg"
-            >
-              <X size={20} color="#4b5563" />
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={notifications}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                className={`p-4 border-b border-gray-100 relative ${item.unread ? 'bg-blue-50' : ''}`}
-              >
-                <Text className="text-base font-medium text-gray-900">{item.title}</Text>
-                <Text className="text-sm text-gray-500 mt-1">{item.desc}</Text>
-                <Text className="text-xs text-gray-400 mt-1">{item.time}</Text>
-                {item.unread && (
-                  <View className="absolute top-4 right-4 w-2 h-2 rounded-full bg-blue-500" />
-                )}
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      </Modal>
-    </View>
+        <Text className="text-gray-800 font-medium">Edit Profile</Text>
+        <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate('ChangePassword')}
+        className="flex-row items-center justify-between bg-white p-4 rounded-2xl mb-3 border border-gray-100"
+      >
+        <Text className="text-gray-800 font-medium">Change Password</Text>
+        <Ionicons name="lock-closed-outline" size={18} color="#6B7280" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Support')}
+        className="flex-row items-center justify-between bg-white p-4 rounded-2xl mb-3 border border-gray-100"
+      >
+        <Text className="text-gray-800 font-medium">Support</Text>
+        <Ionicons name="help-circle-outline" size={18} color="#6B7280" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Terms')}
+        className="flex-row items-center justify-between bg-white p-4 rounded-2xl mb-6 border border-gray-100"
+      >
+        <Text className="text-gray-800 font-medium">Terms & Conditions</Text>
+        <Ionicons name="document-text-outline" size={18} color="#6B7280" />
+      </TouchableOpacity>
+
+      <TouchableOpacity className="bg-red-100 py-4 rounded-2xl items-center">
+        <Text className="text-red-500 font-semibold">Log Out</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 

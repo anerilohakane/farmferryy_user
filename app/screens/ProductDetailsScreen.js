@@ -1,9 +1,9 @@
-// ProductDetailsScreen.js
 import React from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { ArrowLeft, Plus, Minus, Heart, Star, Share2, ChevronRight } from 'lucide-react-native';
 import { useAppContext } from '../context/AppContext';
 import { farmers } from '../components/ui/farmers';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const ProductDetailsScreen = ({ route, navigation }) => {
   const { product } = route.params;
@@ -25,14 +25,22 @@ const ProductDetailsScreen = ({ route, navigation }) => {
     }
   };
 
+  const handleBuyNow = () => {
+    if (!isInCart) {
+      updateCartItems([...cartItems, { ...product, quantity: 1 }]);
+    }
+    navigation.navigate('Checkout', { 
+      items: isInCart ? cartItems : [...cartItems, { ...product, quantity: 1 }]
+    });
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header */}
       <View className="bg-white px-4 py-4 flex-row items-center justify-between border-b border-gray-200">
-        {/* <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft size={24} color="#059669" />
         </TouchableOpacity>
-        <Text className="text-lg font-semibold text-gray-800">Product Details</Text> */}
         <TouchableOpacity onPress={toggleWishlist}>
           <Heart
             size={24}
@@ -44,25 +52,25 @@ const ProductDetailsScreen = ({ route, navigation }) => {
 
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
         {/* Product Image */}
-<View className="w-full bg-gray-50 items-center justify-center py-6">
-  <View
-    className="bg-white rounded-3xl shadow-lg "
-    style={{
-      elevation: 8,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-      transform: [{ translateY: -16 }],
-    }}
-  >
-    <Image
-      source={{ uri: product.image }}
-      className="w-64 h-64 rounded-2xl"
-      resizeMode="contain"
-    />
-  </View>
-</View>
+        <View className="w-full bg-gray-50 items-center justify-center py-6">
+          <View
+            className="bg-white rounded-3xl shadow-lg"
+            style={{
+              elevation: 8,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 0.15,
+              shadowRadius: 12,
+              transform: [{ translateY: -16 }],
+            }}
+          >
+            <Image
+              source={{ uri: product.image }}
+              className="w-64 h-64 rounded-2xl"
+              resizeMode="contain"
+            />
+          </View>
+        </View>
 
 
         {/* Product Info */}
