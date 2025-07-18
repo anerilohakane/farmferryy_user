@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../../context/AppContext';
 import { useUserLocation } from '../../hooks/useUserLocation';
 
-export default function AppBar({ showBack = false, title = "FarmFerry", subtitle = "Nagpur, Maharashtra" }) {
+export default function AppBar({ showBack = false, title = "FarmFerry" }) {
   const navigation = useNavigation();
   const { cartItems } = useAppContext();
   const { address } = useUserLocation(); 
@@ -26,7 +26,7 @@ export default function AppBar({ showBack = false, title = "FarmFerry", subtitle
         shadowRadius: 2,
         elevation: 3,
       }}
-      className="mt-2"
+      className="mt-7"
     >
       {/* Left: Logo or Back Arrow */}
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -65,10 +65,10 @@ export default function AppBar({ showBack = false, title = "FarmFerry", subtitle
           </View>
         )}
         <View>
-          <Text className="text-sm text-gray-500 font-medium">Deliver to</Text>
+           <Text className="text-lg font-bold text-green-700">FarmFerry</Text>
           <View className="flex-row items-center">
             <MapPin size={14} color="green" className="mr-1" />
-            <Text className="text-base font-semibold text-gray-800">
+            <Text className="text-base font-xl text-green-700">
               {address || 'Locating...'}
             </Text>
           </View>

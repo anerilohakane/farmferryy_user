@@ -281,10 +281,17 @@ export default function CartScreen({ navigation }) {
               {cartItems.map((item) => (
                 <View
                   key={item.id}
-                  className="bg-white rounded-2xl mb-4 p-4 shadow-sm border border-green-100"
+                  className="bg-white rounded-2xl mb-4 p-4 shadow-sm border border-gray-200"
+                  style={{
+                    shadowColor: '#6b7280', // Tailwind gray-500
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 6,
+                    elevation: 4,
+                  }}
                 >
                   <View className="flex-row items-start">
-                    <View className="w-24 h-24 bg-green-50 border border-green-200 rounded-xl items-center justify-center mr-3 self-center overflow-hidden">
+                    <View className="w-24 h-24 bg-green-50 border border-gray-200 rounded-xl items-center justify-center mr-3 self-center overflow-hidden">
                       <Image
                         source={{ uri: item.image }}
                         className="w-full h-full"
@@ -332,13 +339,13 @@ export default function CartScreen({ navigation }) {
                       </View>
                     </View>
                   </View>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     className="flex-row items-center mt-3 pt-3 border-t border-green-100"
                     onPress={() => moveToWishlist(item)}
                   >
-                    <Heart 
-                      size={16} 
-                      color={isInWishlist(item.id) ? "red" : "#059669"} 
+                    <Heart
+                      size={16}
+                      color={isInWishlist(item.id) ? "red" : "#059669"}
                       fill={isInWishlist(item.id) ? "red" : "none"}
                     />
                     <Text className="text-sm text-grey-600 ml-2">Move to wishlist</Text>
@@ -375,7 +382,7 @@ export default function CartScreen({ navigation }) {
 
             {/* Promo Code Section */}
             <View className="bg-white mx-4 mt-6 rounded-2xl p-4 shadow-sm border border-green-100">
-              <TouchableOpacity 
+              <TouchableOpacity
                 className="flex-arow items-center justify-between"
                 onPress={handlePromoCode}
               >
