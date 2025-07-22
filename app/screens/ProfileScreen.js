@@ -1,6 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import {
   Bell, ChevronRight, Clock, CreditCard, Edit3,
-  Headphones, Lock, LogOut, Mail, MapPin, Package,
+  Headphones, Lock,
+  Mail, MapPin, Package,
   Phone, Plus, Receipt, Search, Settings, ShoppingBag, Star, User, X
 } from 'lucide-react-native';
 import { useState } from 'react';
@@ -12,8 +14,34 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { SCREEN_NAMES } from '../types';
+
+// Profile menu with keys for mapping and improved shadow classes for container emphasis
+const profileMenu = [
+  { key: 'changePassword', icon: Lock, label: 'Change Password', desc: 'Update your password', color: 'red', badge: null },
+  { key: 'paymentMethods', icon: CreditCard, label: 'Payment Methods', desc: 'Manage cards & wallets', color: 'purple', badge: null },
+  { key: 'rateReview', icon: Star, label: 'Rate & Review', desc: 'Share your experience', color: 'yellow', badge: null },
+  { key: 'settings', icon: Settings, label: 'Settings', desc: 'App preferences', color: 'indigo', badge: null },
+  { key: 'helpSupport', icon: Headphones, label: 'Help & Support', desc: 'Get assistance', color: 'teal', badge: null },
+];
+
+// Use ONLY registered route names here
+// const profileMenuRouteMap = {
+//   changePassword: 'ChangePasswordScreen',
+//   paymentMethods: 'PaymentAndMethods',
+//   rateReview: 'RateReview',
+//   settings: 'SettingScreen',
+//   helpSupport: 'SupportScreen',
+// };
+const profileMenuRouteMap = {
+  changePassword: SCREEN_NAMES.CHANGE_PASSWORD,
+  settings: SCREEN_NAMES.SETTINGS,
+}
+
+const shadowStyle = "shadow-lg shadow-gray-700";
 
 const ProfileScreen = () => {
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('profile');
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -35,21 +63,15 @@ const ProfileScreen = () => {
     { id: 3, title: 'Payment Successful', desc: 'Payment of ₹847 completed', time: '2 hours ago', unread: false },
   ];
 
-  const profileMenu = [
-    { icon: Lock, label: 'Change Password', desc: 'Update your password', color: 'red', badge: null },
-    { icon: CreditCard, label: 'Payment Methods', desc: 'Manage cards & wallets', color: 'purple', badge: null },
-    { icon: Star, label: 'Rate & Review', desc: 'Share your experience', color: 'yellow', badge: null },
-    { icon: Settings, label: 'Settings', desc: 'App preferences', color: 'indigo', badge: null },
-    { icon: Headphones, label: 'Help & Support', desc: 'Get assistance', color: 'teal', badge: null },
-  ];
-
-  const shadowStyle = "shadow-lg shadow-gray-600";
-
   const renderProfileTab = () => (
     <View className="p-4 space-y-6">
       <View className="space-y-4">
-        {profileMenu.map((item, i) => (
-          <TouchableOpacity key={i} className={`w-full bg-white rounded-xl p-4 mb-4 ${shadowStyle}`}>
+        {profileMenu.map((item) => (
+          <TouchableOpacity
+            key={item.key}
+            className={`w-full bg-white rounded-xl p-4 mb-4 ${shadowStyle}`}
+            onPress={() => navigation.navigate(profileMenuRouteMap[item.key] || item.key)}
+          >
             <View className="flex flex-row items-center">
               <View className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 bg-${item.color}-100`}>
                 <item.icon
@@ -59,8 +81,7 @@ const ProfileScreen = () => {
                     item.color === 'purple' ? '#9333ea' :
                     item.color === 'yellow' ? '#ca8a04' :
                     item.color === 'indigo' ? '#4f46e5' :
-                    item.color === 'teal' ? '#0d9488' :
-                    '#000'
+                    item.color === 'teal' ? '#0d9488' : '#000'
                   }
                 />
               </View>
@@ -78,16 +99,11 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
-      <TouchableOpacity className={`w-full flex flex-row items-center justify-center bg-red-100 p-4 rounded-xl gap-2 ${shadowStyle}`}>
-        <LogOut size={20} color="#dc2626" />
-        <Text className="text-base font-medium text-red-600">Logout</Text>
-      </TouchableOpacity>
     </View>
   );
 
   const renderOrdersTab = () => (
     <View className="p-4 space-y-6">
-      {/* Removed "Order History" heading as requested */}
       <View className="space-y-4">
         {recentOrders.map((item) => (
           <View key={item.id} className={`bg-white rounded-xl p-4 mb-4 ${shadowStyle}`}>
@@ -150,18 +166,15 @@ const ProfileScreen = () => {
     </View>
   );
 
-  // Addresses tab with header text removed and spaced Add New
   const renderAddressesTab = () => (
     <View className="p-4 space-y-6">
       <View className="flex flex-row justify-between items-center">
-        {/* Removed "Saved Addresses" heading */}
         <View />
         <TouchableOpacity className="flex flex-row items-center bg-green-600 rounded-lg px-4 py-2 gap-2">
           <Plus size={16} color="#ffffff" />
           <Text className="text-white text-sm font-medium">Add New</Text>
         </TouchableOpacity>
       </View>
-      {/* Additional spacing between Add New button and address cards */}
       <View className="mt-4 space-y-4">
         {savedAddresses.map((item) => (
           <View key={item.id} className={`bg-white rounded-xl p-4 mb-4 ${shadowStyle}`}>
