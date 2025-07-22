@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { useAuth } from '../../context/AuthContext';
 
-const LoginForm = ({ onSuccess, onForgotPassword }) => {
+const LoginForm = ({ onSuccess, onForgotPassword, onRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await login(email, password);
       onSuccess?.();
-    }, 500);
+    } catch (error) {
+      Alert.alert(
+        'Login Failed',
+        error.response?.data?.message || 'An unexpected error occurred. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -21,7 +30,7 @@ const LoginForm = ({ onSuccess, onForgotPassword }) => {
           Welcome Back
         </Text>
         <Text style={{ textAlign: 'center', color: '#666' }}>
-          Sign in to your FarmFerry supplier account
+          Sign in to your FarmFerry account
         </Text>
       </View>
 
@@ -96,9 +105,11 @@ const LoginForm = ({ onSuccess, onForgotPassword }) => {
       <View style={{ marginTop: 24 }}>
         <Text style={{ textAlign: 'center', color: '#666', fontSize: 14 }}>
           Don't have an account?{' '}
-          <Text style={{ color: '#059669', fontWeight: '500' }}>
-            Contact support to register
-          </Text>
+          <TouchableOpacity onPress={onRegister}>
+            <Text style={{ color: '#059669', fontWeight: '500' }}>
+              Register here
+            </Text>
+          </TouchableOpacity>
         </Text>
       </View>
     </View>

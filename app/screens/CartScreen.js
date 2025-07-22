@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,8 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  ActivityIndicator,
+  length
 } from 'react-native';
 import {
   Minus,
@@ -24,16 +26,36 @@ import {
   Trash2,
 } from 'lucide-react-native';
 import { useAppContext } from '../context/AppContext';
+import { cartAPI } from '../services/api';
 
 export default function CartScreen({ navigation }) {
   const {
     cartItems,
     updateCartItems,
-    addToCart,
     wishlistItems,
     addToWishlist,
     removeFromWishlist,
   } = useAppContext();
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Defensive fallback: ensure cartItems is always an array
+  const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
+  console.log('CartScreen cartItems:', cartItems);
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const response = await cartAPI.getCart();
+        updateCartItems(response.data.data.items);
+      } catch (error) {
+        console.error('Failed to fetch cart:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCart();
+  }, []);
 
   const recommendedProducts = [
     {
@@ -93,28 +115,38 @@ export default function CartScreen({ navigation }) {
     },
   ];
 
-  const increaseQty = (id) => {
-    const updated = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-    );
-    updateCartItems(updated);
+  const handleUpdateQuantity = async (productId, quantity) => {
+    try {
+      const response = await cartAPI.updateCartItem(productId, quantity);
+      updateCartItems(response.data.data.items);
+    } catch (error) {
+      console.error('Failed to update quantity:', error);
+    }
   };
 
-  const decreaseQty = (id) => {
-    const updated = cartItems.map((item) =>
-      item.id === id && item.quantity > 1
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
-    );
-    updateCartItems(updated);
+  const increaseQty = (item) => {
+    handleUpdateQuantity(item.id, item.quantity + 1);
   };
 
-  const removeFromCart = (id) => {
-    const updated = cartItems.filter((item) => item.id !== id);
-    updateCartItems(updated);
+  const decreaseQty = (item) => {
+    if (item.quantity > 1) {
+      handleUpdateQuantity(item.id, item.quantity - 1);
+    } else {
+      removeFromCart(item.id);
+    }
+  };
+
+  const removeFromCart = async (productId) => {
+    try {
+      const response = await cartAPI.removeCartItem(productId);
+      updateCartItems(response.data.data.items);
+    } catch (error) {
+      console.error('Failed to remove from cart:', error);
+    }
   };
 
   const toggleWishlist = (product) => {
+    if (!product || !product.name) return;
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
       Alert.alert('Removed from Wishlist', `${product.name} has been removed from your wishlist`);
@@ -125,10 +157,11 @@ export default function CartScreen({ navigation }) {
   };
 
   const isInWishlist = (id) => {
-    return wishlistItems.some((item) => item.id === id);
+    return wishlistItems.some((item) => item._id === id);
   };
 
   const moveToWishlist = (product) => {
+    if (!product || !product.name) return;
     if (!isInWishlist(product.id)) {
       addToWishlist(product);
     }
@@ -136,17 +169,17 @@ export default function CartScreen({ navigation }) {
     Alert.alert('Moved to Wishlist', `${product.name} has been moved to your wishlist`);
   };
 
-  const handleAddRecommended = (product) => {
-    const existingItem = cartItems.find((item) => item.id === product.id);
-    const productToAdd = { ...product, quantity: 1, image: product.image.uri };
-
-    if (existingItem) {
-      increaseQty(existingItem.id);
-    } else {
-      addToCart(productToAdd);
+  const handleAddRecommended = async (product) => {
+    if (!product || !product.name) return;
+    try {
+        await cartAPI.addToCart({ productId: product.id, quantity: 1 });
+        const response = await cartAPI.getCart();
+        updateCartItems(response.data.data.items);
+        Alert.alert('Added to Cart', `${product.name} has been added to your cart`);
+    } catch (error) {
+        console.error('Failed to add recommended product to cart:', error);
+        Alert.alert('Error', 'Could not add item to cart.');
     }
-
-    Alert.alert('Added to Cart', `${product.name} has been added to your cart`);
   };
 
   const handlePromoCode = () => navigation.navigate('PromoCode');
@@ -168,11 +201,11 @@ export default function CartScreen({ navigation }) {
   const handleChangeAddress = () => navigation.navigate('SelectAddress');
 
   const getSubtotal = () =>
-    cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    safeCartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const getShipping = () => 4.0;
   const getTotal = () => getSubtotal() + getShipping();
   const getSavings = () =>
-    cartItems.reduce((sum, item) => {
+    safeCartItems.reduce((sum, item) => {
       if (item.originalPrice) {
         return sum + (item.originalPrice - item.price) * item.quantity;
       }
@@ -180,53 +213,64 @@ export default function CartScreen({ navigation }) {
     }, 0);
 
   const renderRecommendedProduct = (product) => (
-    <View
-      key={product.id}
-      className="bg-white rounded-2xl p-3 mr-3 shadow-sm border border-green-100"
-      style={{ width: 160 }}
-    >
-      <View className="relative w-full h-24 bg-green-50 rounded-xl mb-3 overflow-hidden">
-        <Image source={{ uri: product.image.uri }} className="w-full h-full" resizeMode="cover" />
-        <View className="absolute top-1 left-1 bg-green-500 px-2 py-1 rounded-full">
-          <Text className="text-white text-xs font-medium">{product.discount}</Text>
+    (!product || !product.name) ? null : (
+      <View
+        key={product.id}
+        className="bg-white rounded-2xl p-3 mr-3 shadow-sm border border-green-100"
+        style={{ width: 160 }}
+      >
+        <View className="relative w-full h-24 bg-green-50 rounded-xl mb-3 overflow-hidden">
+          <Image source={{ uri: product.image.uri }} className="w-full h-full" resizeMode="cover" />
+          <View className="absolute top-1 left-1 bg-green-500 px-2 py-1 rounded-full">
+            <Text className="text-white text-xs font-medium">{product.discount}</Text>
+          </View>
+          <TouchableOpacity
+            className="absolute top-1 right-1 w-6 h-6 bg-white rounded-full items-center justify-center shadow-sm"
+            onPress={() => toggleWishlist(product)}
+          >
+            <Heart
+              size={12}
+              color={isInWishlist(product.id) ? 'red' : '#059669'}
+              fill={isInWishlist(product.id) ? 'red' : 'none'}
+            />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          className="absolute top-1 right-1 w-6 h-6 bg-white rounded-full items-center justify-center shadow-sm"
-          onPress={() => toggleWishlist(product)}
-        >
-          <Heart
-            size={12}
-            color={isInWishlist(product.id) ? 'red' : '#059669'}
-            fill={isInWishlist(product.id) ? 'red' : 'none'}
-          />
-        </TouchableOpacity>
-      </View>
-      <Text className="text-sm font-semibold text-green-800 mb-1" numberOfLines={2}>
-        {product.name}
-      </Text>
-      <Text className="text-xs text-green-600 mb-2">{product.weight}</Text>
-      <View className="flex-row items-center mb-2">
-        <Star size={12} color="#F59E0B" fill="#F59E0B" />
-        <Text className="text-xs text-gray-600 ml-1">{product.rating}</Text>
-        <View className="flex-row items-center ml-2">
-          <Clock size={10} color="#059669" />
-          <Text className="text-xs text-green-600 ml-1">{product.deliveryTime}</Text>
+        <Text className="text-sm font-semibold text-green-800 mb-1" numberOfLines={2}>
+          {product.name}
+        </Text>
+        <Text className="text-xs text-green-600 mb-2">{product.weight}</Text>
+        <View className="flex-row items-center mb-2">
+          <Star size={12} color="#F59E0B" fill="#F59E0B" />
+          <Text className="text-xs text-gray-600 ml-1">{product.rating}</Text>
+          <View className="flex-row items-center ml-2">
+            <Clock size={10} color="#059669" />
+            <Text className="text-xs text-green-600 ml-1">{product.deliveryTime}</Text>
+          </View>
+        </View>
+        <View className="flex-row items-center justify-between">
+          <View>
+            <Text className="text-sm font-bold text-green-800">₹{product.price.toFixed(2)}</Text>
+            <Text className="text-xs text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</Text>
+          </View>
+          <TouchableOpacity
+            className="bg-green-500 w-8 h-8 rounded-full items-center justify-center"
+            onPress={() => handleAddRecommended(product)}
+          >
+            <Plus size={14} color="white" />
+          </TouchableOpacity>
         </View>
       </View>
-      <View className="flex-row items-center justify-between">
-        <View>
-          <Text className="text-sm font-bold text-green-800">₹{product.price.toFixed(2)}</Text>
-          <Text className="text-xs text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</Text>
-        </View>
-        <TouchableOpacity
-          className="bg-green-500 w-8 h-8 rounded-full items-center justify-center"
-          onPress={() => handleAddRecommended(product)}
-        >
-          <Plus size={14} color="white" />
-        </TouchableOpacity>
-      </View>
-    </View>
+    )
   );
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#059669" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <StatusBar backgroundColor="white" barStyle="dark-content" />
@@ -251,7 +295,7 @@ export default function CartScreen({ navigation }) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-        {cartItems.length === 0 ? (
+        {(safeCartItems?.length ?? 0) === 0 ? (
           <View className="flex-1 items-center justify-center mt-20">
             <View className="w-20 h-20 bg-green-100 rounded-full items-center justify-center mb-4">
               <Text className="text-green-400 text-2xl">🛒</Text>
@@ -267,7 +311,7 @@ export default function CartScreen({ navigation }) {
                 <View>
                   <Text className="text-lg font-semibold text-grey-800">Get it in 10 mins</Text>
                   <Text className="text-sm text-green-600">
-                    {cartItems.length} Product{cartItems.length > 1 ? 's' : ''}
+                    {(safeCartItems?.length ?? 0)} Product{(safeCartItems?.length ?? 0) > 1 ? 's' : ''}
                   </Text>
                 </View>
                 <View className="bg-green-100 px-3 py-1 rounded-full">
@@ -278,80 +322,84 @@ export default function CartScreen({ navigation }) {
 
             {/* Cart Items */}
             <View className="px-4 pt-4">
-              {cartItems.map((item) => (
-                <View
-                  key={item.id}
-                  className="bg-white rounded-2xl mb-4 p-4 shadow-sm border border-gray-200"
-                  style={{
-                    shadowColor: '#6b7280', // Tailwind gray-500
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.15,
-                    shadowRadius: 6,
-                    elevation: 4,
-                  }}
-                >
-                  <View className="flex-row items-start">
-                    <View className="w-24 h-24 bg-green-50 border border-gray-200 rounded-xl items-center justify-center mr-3 self-center overflow-hidden">
-                      <Image
-                        source={{ uri: item.image }}
-                        className="w-full h-full"
-                        resizeMode="contain"
-                      />
-                    </View>
-                    <View className="flex-1">
-                      <View className="flex-row justify-between items-start mb-1">
-                        <Text className="font-semibold text-base text-black-800 flex-1">{item.name}</Text>
-                        <TouchableOpacity onPress={() => removeFromCart(item.id)} className="ml-2">
-                          <Trash2 size={18} color="red" />
-                        </TouchableOpacity>
-                      </View>
-                      <Text className="text-sm text-green-600 mb-1">{item.unit || '500 g'}</Text>
-                      <View className="flex-row items-center mb-3">
-                        <Text className="text-lg font-bold text-green-800">
-                          ₹{(item.price * item.quantity).toFixed(2)}
-                        </Text>
-                        {item.originalPrice && (
-                          <Text className="text-sm text-gray-400 line-through ml-2">
-                            ₹{item.originalPrice}
-                          </Text>
-                        )}
-                      </View>
-                      <View className="flex-row items-center justify-between">
-                        <View className="flex-row items-center bg-green-50 rounded-full px-1 py-1">
-                          <TouchableOpacity
-                            onPress={() => decreaseQty(item.id)}
-                            className="w-8 h-8 rounded-full bg-white items-center justify-center shadow-sm border border-green-100"
-                          >
-                            <Minus size={14} color="#059669" />
-                          </TouchableOpacity>
-                          <Text className="mx-4 font-medium text-green-700">{item.quantity}</Text>
-                          <TouchableOpacity
-                            onPress={() => increaseQty(item.id)}
-                            className="w-8 h-8 rounded-full bg-white items-center justify-center shadow-sm border border-green-100"
-                          >
-                            <Plus size={14} color="#059669" />
-                          </TouchableOpacity>
-                        </View>
-                        <View className="flex-row items-center bg-green-100 px-3 py-1 rounded-full">
-                          <Text className="text-green-700 text-xs">✓</Text>
-                          <Text className="text-grey-700 text-xs ml-1">Har Din Sasta</Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    className="flex-row items-center mt-3 pt-3 border-t border-green-100"
-                    onPress={() => moveToWishlist(item)}
+              {safeCartItems.map((item, idx) => {
+                console.log('Rendering cart item', idx, item);
+                if (!item) return null;
+                return (
+                  <View
+                    key={item.id}
+                    className="bg-white rounded-2xl mb-4 p-4 shadow-sm border border-gray-200"
+                    style={{
+                      shadowColor: '#6b7280', // Tailwind gray-500
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.15,
+                      shadowRadius: 6,
+                      elevation: 4,
+                    }}
                   >
-                    <Heart
-                      size={16}
-                      color={isInWishlist(item.id) ? "red" : "#059669"}
-                      fill={isInWishlist(item.id) ? "red" : "none"}
-                    />
-                    <Text className="text-sm text-grey-600 ml-2">Move to wishlist</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
+                    <View className="flex-row items-start">
+                      <View className="w-24 h-24 bg-green-50 border border-gray-200 rounded-xl items-center justify-center mr-3 self-center overflow-hidden">
+                        <Image
+                          source={{ uri: item.images?.[0]?.url || item.image }}
+                          className="w-full h-full"
+                          resizeMode="contain"
+                        />
+                      </View>
+                      <View className="flex-1">
+                        <View className="flex-row justify-between items-start mb-1">
+                          <Text className="font-semibold text-base text-black-800 flex-1">{item.name}</Text>
+                          <TouchableOpacity onPress={() => removeFromCart(item.id)} className="ml-2">
+                            <Trash2 size={18} color="red" />
+                          </TouchableOpacity>
+                        </View>
+                        <Text className="text-sm text-green-600 mb-1">{item.unit || '500 g'}</Text>
+                        <View className="flex-row items-center mb-3">
+                          <Text className="text-lg font-bold text-green-800">
+                            ₹{(item.price * item.quantity).toFixed(2)}
+                          </Text>
+                          {item.originalPrice && (
+                            <Text className="text-sm text-gray-400 line-through ml-2">
+                              ₹{item.originalPrice}
+                            </Text>
+                          )}
+                        </View>
+                        <View className="flex-row items-center justify-between">
+                          <View className="flex-row items-center bg-green-50 rounded-full px-1 py-1">
+                            <TouchableOpacity
+                              onPress={() => decreaseQty(item)}
+                              className="w-8 h-8 rounded-full bg-white items-center justify-center shadow-sm border border-green-100"
+                            >
+                              <Minus size={14} color="#059669" />
+                            </TouchableOpacity>
+                            <Text className="mx-4 font-medium text-green-700">{item.quantity}</Text>
+                            <TouchableOpacity
+                              onPress={() => increaseQty(item)}
+                              className="w-8 h-8 rounded-full bg-white items-center justify-center shadow-sm border border-green-100"
+                            >
+                              <Plus size={14} color="#059669" />
+                            </TouchableOpacity>
+                          </View>
+                          <View className="flex-row items-center bg-green-100 px-3 py-1 rounded-full">
+                            <Text className="text-green-700 text-xs">✓</Text>
+                            <Text className="text-grey-700 text-xs ml-1">Har Din Sasta</Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <TouchableOpacity
+                      className="flex-row items-center mt-3 pt-3 border-t border-green-100"
+                      onPress={() => moveToWishlist(item)}
+                    >
+                      <Heart
+                        size={16}
+                        color={isInWishlist(item.id) ? "red" : "#059669"}
+                        fill={isInWishlist(item.id) ? "red" : "none"}
+                      />
+                      <Text className="text-sm text-grey-600 ml-2">Move to wishlist</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
             </View>
 
             {/* Recommended Products */}
@@ -400,7 +448,7 @@ export default function CartScreen({ navigation }) {
       </ScrollView>
 
       {/* Checkout Bar */}
-      {cartItems.length > 0 && (
+      {(safeCartItems?.length ?? 0) > 0 && (
         <View className="bg-white border-t border-green-100">
           <View className="px-4 py-3 border-b border-green-100">
             <View className="flex-row justify-between items-center mb-2">
@@ -434,7 +482,7 @@ export default function CartScreen({ navigation }) {
                 shipping: getShipping(),
                 total: getTotal(),
                 savings: getSavings(),
-                items: cartItems
+                items: safeCartItems
               })}
               activeOpacity={0.9}
               className="rounded-2xl overflow-hidden shadow-sm"

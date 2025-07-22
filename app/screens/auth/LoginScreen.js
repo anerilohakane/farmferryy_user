@@ -16,6 +16,10 @@ const LoginScreen = () => {
     navigation.navigate(SCREEN_NAMES.FORGOT_PASSWORD);
   };
 
+  const handleRegister = () => {
+    navigation.navigate(SCREEN_NAMES.REGISTER);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView 
@@ -28,6 +32,7 @@ const LoginScreen = () => {
           <LoginForm
             onSuccess={handleLoginSuccess}
             onForgotPassword={handleForgotPassword}
+            onRegister={handleRegister}
           />
         </View>
       </ScrollView>

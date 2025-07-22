@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,85 +9,54 @@ import {
   RefreshControl,
   Dimensions,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ShoppingCart } from 'lucide-react-native';
+import { ordersAPI } from '../services/api';
+import { format } from 'date-fns';
 
 const { width } = Dimensions.get('window');
 
-const orders = [
-  {
-    id: '1234',
-    date: '2025-07-01',
-    status: 'Delivered',
-    total: '₹325',
-    items: 3,
-    restaurant: 'Spice Kitchen',
-    estimatedTime: 'Delivered at 2:30 PM',
-    image: '🍛',
-  },
-  {
-    id: '1235',
-    date: '2025-06-28',
-    status: 'Processing',
-    total: '₹210',
-    items: 2,
-    restaurant: 'Pizza Palace',
-    estimatedTime: 'Arriving in 25 mins',
-    image: '🍕',
-  },
-  {
-    id: '1236',
-    date: '2025-06-25',
-    status: 'Cancelled',
-    total: '₹180',
-    items: 1,
-    restaurant: 'Burger House',
-    estimatedTime: 'Order cancelled',
-    image: '🍔',
-  },
-  {
-    id: '1237',
-    date: '2025-06-22',
-    status: 'Delivered',
-    total: '₹450',
-    items: 4,
-    restaurant: 'Thai Express',
-    estimatedTime: 'Delivered at 7:15 PM',
-    image: '🍜',
-  },
-  {
-    id: '1238',
-    date: '2025-06-20',
-    status: 'Delivered',
-    total: '₹290',
-    items: 2,
-    restaurant: 'Dessert Corner',
-    estimatedTime: 'Delivered at 4:45 PM',
-    image: '🍰',
-  },
-];
-
-const filterOptions = ['All', 'Processing', 'Delivered', 'Cancelled'];
+const filterOptions = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
 export default function OrdersScreen() {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      const params = selectedFilter === 'All' ? {} : { status: selectedFilter.toLowerCase() };
+      const response = await ordersAPI.getMyOrders(params);
+      setOrders(response.data.data);
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [selectedFilter]);
 
   const onRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+    fetchOrders();
   };
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'Delivered':
       case 'Processing':
+      case 'Shipped':
         return 'bg-green-100 text-green-800';
       case 'Cancelled':
         return 'bg-red-100 text-red-800';
@@ -102,6 +71,8 @@ export default function OrdersScreen() {
         return 'checkmark-circle';
       case 'Processing':
         return 'time';
+      case 'Shipped':
+        return 'rocket';
       case 'Cancelled':
         return 'close-circle';
       default:
@@ -109,10 +80,7 @@ export default function OrdersScreen() {
     }
   };
 
-  const filteredOrders =
-    selectedFilter === 'All'
-      ? orders
-      : orders.filter((order) => order.status === selectedFilter);
+  const filteredOrders = orders;
 
   const renderFilterTab = (filter) => (
     <TouchableOpacity
@@ -137,7 +105,7 @@ export default function OrdersScreen() {
 
   const renderOrderItem = ({ item }) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate('OrderDetails', { orderId: item.id })}
+      onPress={() => navigation.navigate('OrderDetails', { orderId: item._id })}
       className="bg-white mx-4 mb-4 rounded-3xl shadow-sm border border-gray-100"
       style={{
         shadowColor: '#000',
@@ -152,10 +120,12 @@ export default function OrdersScreen() {
         <View className="flex-row justify-between items-start mb-3">
           <View className="flex-1">
             <View className="flex-row items-center mb-1">
-              <Text className="text-3xl mr-3">{item.image}</Text>
+              <Text className="text-3xl mr-3">🛒</Text>
               <View className="flex-1">
-                <Text className="text-lg font-bold text-gray-800">{item.restaurant}</Text>
-                <Text className="text-sm text-gray-500">Order #{item.id}</Text>
+                <Text className="text-lg font-bold text-gray-800">Order #{item.orderId}</Text>
+                <Text className="text-sm text-gray-500">
+                  {item.items.length} item{item.items.length > 1 ? 's' : ''}
+                </Text>
               </View>
             </View>
           </View>
@@ -183,29 +153,27 @@ export default function OrdersScreen() {
           <View className="flex-row justify-between items-center mb-2">
             <View className="flex-row items-center">
               <Ionicons name="calendar-outline" size={16} color="#6b7280" />
-              <Text className="text-sm text-gray-600 ml-2">{item.date}</Text>
+              <Text className="text-sm text-gray-600 ml-2">
+                {format(new Date(item.createdAt), 'dd MMM yyyy')}
+              </Text>
             </View>
             <View className="flex-row items-center">
-              <Ionicons name="restaurant-outline" size={16} color="#6b7280" />
-              <Text className="text-sm text-gray-600 ml-2">{item.items} items</Text>
+              <Ionicons name="pricetag-outline" size={16} color="#6b7280" />
+              <Text className="text-sm text-gray-600 ml-2">₹{item.totalAmount.toFixed(2)}</Text>
             </View>
-          </View>
-          <View className="flex-row items-center">
-            <Ionicons name="time-outline" size={16} color="#6b7280" />
-            <Text className="text-sm text-gray-600 ml-2">{item.estimatedTime}</Text>
           </View>
         </View>
 
         {/* Footer */}
         <View className="flex-row justify-between items-center">
           <View className="flex-row items-center">
-            <Text className="text-2xl font-bold text-gray-800">{item.total}</Text>
+            <Text className="text-2xl font-bold text-gray-800">₹{item.totalAmount.toFixed(2)}</Text>
             <Text className="text-sm text-gray-500 ml-2">Total</Text>
           </View>
 
           {/* ✅ Updated View Details Button */}
           <TouchableOpacity
-            onPress={() => navigation.navigate('OrderDetails', { orderId: item.id })}
+            onPress={() => navigation.navigate('OrderDetails', { orderId: item._id })}
             className="overflow-hidden rounded-xl"
             style={{
               shadowColor: '#059669',
@@ -248,6 +216,14 @@ export default function OrdersScreen() {
     </View>
   );
 
+  if (isLoading && !refreshing) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#10B981" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
@@ -282,7 +258,7 @@ export default function OrdersScreen() {
         ) : (
           <FlatList
             data={filteredOrders}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
             renderItem={renderOrderItem}
             contentContainerStyle={{ paddingVertical: 20 }}
             showsVerticalScrollIndicator={false}

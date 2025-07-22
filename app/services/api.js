@@ -101,45 +101,31 @@ export const authAPI = {
   changePassword: (currentPassword, newPassword) => api.post('/auth/change-password', { currentPassword, newPassword }),
 };
 
-export const supplierAPI = {
-  getProfile: () => api.get(CONFIG.ENDPOINTS.SUPPLIER.PROFILE),
-  updateProfile: (data) => api.put(CONFIG.ENDPOINTS.SUPPLIER.UPDATE_PROFILE, data),
-  updateLogo: (formData) => api.put(CONFIG.ENDPOINTS.SUPPLIER.UPDATE_LOGO, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }),
-  updateAddress: (addressData) => api.put(CONFIG.ENDPOINTS.SUPPLIER.UPDATE_ADDRESS, addressData),
-  updateBankDetails: (bankDetailsData) => api.put(CONFIG.ENDPOINTS.SUPPLIER.UPDATE_BANK_DETAILS, bankDetailsData),
-  uploadVerificationDocument: (formData) => api.post(CONFIG.ENDPOINTS.SUPPLIER.UPLOAD_DOCUMENT, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }),
-  getDashboardStats: () => api.get(CONFIG.ENDPOINTS.SUPPLIER.DASHBOARD_STATS),
+export const customerAPI = {
+  getProfile: () => api.get(CONFIG.ENDPOINTS.CUSTOMER.PROFILE),
+  updateProfile: (data) => api.put(CONFIG.ENDPOINTS.CUSTOMER.UPDATE_PROFILE, data),
+  addAddress: (addressData) => api.post(CONFIG.ENDPOINTS.CUSTOMER.ADD_ADDRESS, addressData),
+  updateAddress: (id, addressData) => api.put(`${CONFIG.ENDPOINTS.CUSTOMER.UPDATE_ADDRESS}/${id}`, addressData),
+  deleteAddress: (id) => api.delete(`${CONFIG.ENDPOINTS.CUSTOMER.DELETE_ADDRESS}/${id}`),
 };
 
 export const productsAPI = {
   getProducts: (params) => api.get(CONFIG.ENDPOINTS.PRODUCTS.LIST, { params }),
-  createProduct: (data) => {
-    // If data is FormData, let the browser set the Content-Type header automatically
-    if (data instanceof FormData) {
-      return api.post(CONFIG.ENDPOINTS.PRODUCTS.CREATE, data);
-    }
-    return api.post(CONFIG.ENDPOINTS.PRODUCTS.CREATE, data);
-  },
-  updateProduct: (id, data) => {
-    // If data is FormData, let the browser set the Content-Type header automatically
-    if (data instanceof FormData) {
-      return api.put(`${CONFIG.ENDPOINTS.PRODUCTS.UPDATE}/${id}`, data);
-    }
-    return api.put(`${CONFIG.ENDPOINTS.PRODUCTS.UPDATE}/${id}`, data);
-  },
-  deleteProduct: (id) => api.delete(`${CONFIG.ENDPOINTS.PRODUCTS.DELETE}/${id}`),
   getProductDetails: (id) => api.get(`${CONFIG.ENDPOINTS.PRODUCTS.DETAILS}/${id}`),
+  searchProducts: (query) => api.get(`${CONFIG.ENDPOINTS.PRODUCTS.SEARCH}?q=${query}`),
 };
 
 export const ordersAPI = {
-  getOrders: (params) => api.get(CONFIG.ENDPOINTS.ORDERS.LIST, { params }),
+  createOrder: (orderData) => api.post(CONFIG.ENDPOINTS.ORDERS.CREATE, orderData),
+  getMyOrders: (params) => api.get(CONFIG.ENDPOINTS.ORDERS.LIST, { params }),
   getOrderDetails: (id) => api.get(`${CONFIG.ENDPOINTS.ORDERS.DETAILS}/${id}`),
-  updateOrderStatus: (id, status) => api.put(`${CONFIG.ENDPOINTS.ORDERS.UPDATE_STATUS}/${id}/status`, { status }),
-  getOrderStatusCounts: () => api.get(CONFIG.ENDPOINTS.ORDERS.STATUS_COUNTS),
+};
+
+export const cartAPI = {
+  getCart: () => api.get(CONFIG.ENDPOINTS.CART.GET),
+  addToCart: (item) => api.post(CONFIG.ENDPOINTS.CART.ADD, item),
+  updateCartItem: (id, quantity) => api.put(`${CONFIG.ENDPOINTS.CART.UPDATE}/${id}`, { quantity }),
+  removeCartItem: (id) => api.delete(`${CONFIG.ENDPOINTS.CART.REMOVE}/${id}`),
 };
 
 export const categoriesAPI = {

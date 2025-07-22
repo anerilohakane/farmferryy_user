@@ -1,39 +1,40 @@
 export const CONFIG = {
-  API_BASE_URL: 'http://192.168.244.112:9000/api/v1',
-  // API_BASE_URL: 'http://localhost:9000/api/v1', // For web development
+  // API_BASE_URL: 'https://farmferry-backend-revised.onrender.com/api/v1',
+  API_BASE_URL: 'http://192.168.0.114:9000/api/v1', // For web development
   // API_BASE_URL: 'https://your-production-api.com/api/v1', // For production
   
   // API Endpoints
   ENDPOINTS: {
     AUTH: {
-      LOGIN: '/auth/login/supplier',
-      REGISTER: '/auth/register/supplier',
+      LOGIN: '/auth/login/customer',
+      REGISTER: '/auth/register/customer',
       REFRESH_TOKEN: '/auth/refresh-token',
       LOGOUT: '/auth/logout',
       FORGOT_PASSWORD: '/auth/forgot-password',
       RESET_PASSWORD: '/auth/reset-password',
     },
-    SUPPLIER: {
-      PROFILE: '/suppliers/profile',
-      UPDATE_PROFILE: '/suppliers/profile',
-      UPDATE_LOGO: '/suppliers/profile/logo',
-      UPDATE_ADDRESS: '/suppliers/address',
-      UPDATE_BANK_DETAILS: '/suppliers/bank-details',
-      UPLOAD_DOCUMENT: '/suppliers/verification-document',
-      DASHBOARD_STATS: '/suppliers/dashboard-stats',
+    CUSTOMER: {
+      PROFILE: '/customers/profile',
+      UPDATE_PROFILE: '/customers/profile',
+      ADD_ADDRESS: '/customers/address',
+      UPDATE_ADDRESS: '/customers/address',
+      DELETE_ADDRESS: '/customers/address',
     },
     PRODUCTS: {
-      LIST: '/products/supplier/me',
-      CREATE: '/products',
-      UPDATE: '/products',
-      DELETE: '/products',
+      LIST: '/products',
       DETAILS: '/products',
+      SEARCH: '/products/search',
     },
     ORDERS: {
-      LIST: '/suppliers/orders',
-      DETAILS: '/suppliers/orders',
-      UPDATE_STATUS: '/suppliers/orders',
-      STATUS_COUNTS: '/orders/supplier/me/status-counts',
+      CREATE: '/orders',
+      LIST: '/orders/my-orders',
+      DETAILS: '/orders',
+    },
+    CART: {
+      GET: '/cart',
+      ADD: '/cart/item',
+      UPDATE: '/cart/item',
+      REMOVE: '/cart/item',
     },
     CATEGORIES: {
       LIST: '/categories',
@@ -42,7 +43,7 @@ export const CONFIG = {
   
   // App Configuration
   APP: {
-    NAME: 'FarmFerry Supplier',
+    NAME: 'FarmFerry',
     VERSION: '1.0.0',
   },
   

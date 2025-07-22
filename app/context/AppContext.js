@@ -212,7 +212,10 @@ export const AppProvider = ({ children }) => {
     );
   };
 
-  const updateCartItems = (items) => setCartItems(items);
+  const updateCartItems = (items) => {
+    console.log('updateCartItems called with:', items);
+    setCartItems(Array.isArray(items) ? items : []);
+  };
   const updateWishlistItems = (items) => setWishlistItems(items);
 
   return (

@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CONFIG } from '../constants/config';
-import { authAPI } from '../services/api';
+import { authAPI, customerAPI } from '../services/api';
 
 const AuthContext = createContext();
 
 const initialState = {
-  user: { name: 'Demo User' },
-  token: 'demo-token',
-  isLoading: false,
-  isAuthenticated: true,
+  user: null,
+  token: null,
+  isLoading: true,
+  isAuthenticated: false,
 };
 
 const authReducer = (state, action) => {
@@ -54,11 +54,51 @@ const authReducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Remove useEffect and checkAuthStatus
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem(CONFIG.STORAGE_KEYS.ACCESS_TOKEN);
+        if (token) {
+          // You might want to verify the token with the backend here
+          const userResponse = await customerAPI.getProfile();
+          console.log('userResponse: ', userResponse);
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            payload: { user: userResponse.data.data, accessToken: token },
+          });
+        } else {
+          dispatch({ type: 'SET_LOADING', payload: false });
+        }
+      } catch (error) {
+        // Token might be invalid, so we log out
+        await logout();
+      }
+    };
 
-  // Bypass login: always resolve
-  const login = async (credentials) => {
-    return { success: true };
+    checkAuthStatus();
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const response = await authAPI.login({ email, password });
+      console.log('LOGIN RESPONSE:', response.data); // <-- Added for debugging
+      const { user, accessToken, refreshToken } = response.data.data;
+
+      await AsyncStorage.setItem(CONFIG.STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+      await AsyncStorage.setItem(CONFIG.STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      await AsyncStorage.setItem(CONFIG.STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: { user, accessToken },
+      });
+
+      return { success: true };
+    } catch (error) {
+      dispatch({ type: 'SET_LOADING', payload: false });
+      throw error;
+    }
   };
 
   const register = async (userData) => {
@@ -68,23 +108,9 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.register(userData);
       const { user, accessToken, refreshToken } = response.data.data;
 
-      // Store tokens and user data safely
-      const promises = [
-        AsyncStorage.setItem(CONFIG.STORAGE_KEYS.ACCESS_TOKEN, accessToken),
-        AsyncStorage.setItem(CONFIG.STORAGE_KEYS.REFRESH_TOKEN, refreshToken),
-      ];
-      if (user) {
-        promises.push(AsyncStorage.setItem(CONFIG.STORAGE_KEYS.USER_DATA, JSON.stringify(user)));
-      } else {
-        promises.push(AsyncStorage.removeItem(CONFIG.STORAGE_KEYS.USER_DATA));
-      }
-      await Promise.all(promises);
-
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: { user, accessToken },
-      });
-
+      // Do not log in the user automatically after registration
+      // The user should log in manually
+      
       return { success: true };
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });

@@ -1,20 +1,34 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!name || !email || !phone || !password) {
       Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
 
-    Alert.alert('Success', 'Account created!');
-    navigation.navigate('Login');
+    setIsLoading(true);
+    try {
+      await register({ name, email, phone, password });
+      Alert.alert('Success', 'Account created successfully! Please log in.');
+      navigation.navigate('Login');
+    } catch (error) {
+      Alert.alert(
+        'Registration Failed',
+        error.response?.data?.message || 'An unexpected error occurred. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,9 +68,12 @@ export default function RegisterScreen({ navigation }) {
 
       <TouchableOpacity
         onPress={handleRegister}
+        disabled={isLoading}
         className="bg-green-500 py-4 rounded-2xl items-center"
       >
-        <Text className="text-white text-base font-semibold">Register</Text>
+        <Text className="text-white text-base font-semibold">
+          {isLoading ? 'Registering...' : 'Register'}
+        </Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

@@ -14,6 +14,9 @@ const Tab = createBottomTabNavigator();
 export default function MainTabNavigator() {
   const { cartItems, wishlistItems } = useAppContext(); // ✅ use actual context arrays
 
+  const cartCount = Array.isArray(cartItems) ? cartItems.length : 0;
+  const wishlistCount = Array.isArray(wishlistItems) ? wishlistItems.length : 0;
+
   const renderIcon = (Icon, focused, badge) => (
     <View className="items-center relative">
       <Icon size={22} color={focused ? '#16a34a' : '#6b7280'} />
@@ -56,7 +59,7 @@ export default function MainTabNavigator() {
         name="Cart"
         component={CartScreen}
         options={{
-          tabBarIcon: ({ focused }) => renderIcon(ShoppingCart, focused, cartItems.length),
+          tabBarIcon: ({ focused }) => renderIcon(ShoppingCart, focused, cartCount),
           tabBarLabel: 'Cart',
         }}
       />
@@ -72,7 +75,7 @@ export default function MainTabNavigator() {
         name="Wishlist"
         component={WishlistScreen}
         options={{
-          tabBarIcon: ({ focused }) => renderIcon(Heart, focused, wishlistItems.length),
+          tabBarIcon: ({ focused }) => renderIcon(Heart, focused, wishlistCount),
           tabBarLabel: 'Wishlist',
         }}
       />

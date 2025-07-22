@@ -22,6 +22,8 @@ import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 // Loading Screen
 import LoadingScreen from '../screens/LoadingScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
+import CheckoutScreen from '../screens/CheckoutScreen';
+import AddAddressScreen from '../screens/AddAddressScreen';
 
 const Stack = createStackNavigator();
 
@@ -61,6 +63,16 @@ const AppNavigator = () => {
             name={SCREEN_NAMES.PRODUCT_DETAILS}
             component={ProductDetailsScreen}
             options={{ headerShown: true }}
+          />
+          <Stack.Screen
+            name="Checkout"
+            component={CheckoutScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="AddAddress"
+            component={AddAddressScreen}
+            options={{ headerShown: false }}
           />
         </>
       ) : (
