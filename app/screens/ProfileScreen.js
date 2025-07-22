@@ -1,6 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import {
   Bell, ChevronRight, Clock, CreditCard, Edit3,
-  Headphones, Lock, LogOut, Mail, MapPin, Package,
+  Headphones, Lock,
+  Mail, MapPin, Package,
   Phone, Plus, Receipt, Search, Settings, ShoppingBag, Star, User, X
 } from 'lucide-react-native';
 import React, { useState, useEffect } from 'react';
@@ -13,14 +15,8 @@ import {
   View,
   ActivityIndicator
 } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { useNavigation } from '@react-navigation/native';
-import { customerAPI, ordersAPI } from '../services/api';
-import { format } from 'date-fns';
 
 const ProfileScreen = () => {
-  const navigation = useNavigation();
-  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [showNotifications, setShowNotifications] = useState(false);
   const [recentOrders, setRecentOrders] = useState([]);
@@ -67,11 +63,11 @@ const ProfileScreen = () => {
   ];
 
   const profileMenu = [
-    { icon: Lock, label: 'Change Password', desc: 'Update your password', color: 'red', badge: null, screen: 'ChangePassword' },
-    { icon: CreditCard, label: 'Payment Methods', desc: 'Manage cards & wallets', color: 'purple', badge: null, screen: 'PaymentMethods' },
-    { icon: Star, label: 'Rate & Review', desc: 'Share your experience', color: 'yellow', badge: null, screen: 'RateAndReview' },
-    { icon: Settings, label: 'Settings', desc: 'App preferences', color: 'indigo', badge: null, screen: 'Settings' },
-    { icon: Headphones, label: 'Help & Support', desc: 'Get assistance', color: 'teal', badge: null, screen: 'Support' },
+    { icon: Lock, label: 'Change Password', desc: 'Update your password', color: 'red', badge: null },
+    { icon: CreditCard, label: 'Payment Methods', desc: 'Manage cards & wallets', color: 'purple', badge: null },
+    { icon: Star, label: 'Rate & Review', desc: 'Share your experience', color: 'yellow', badge: null },
+    { icon: Settings, label: 'Settings', desc: 'App preferences', color: 'indigo', badge: null },
+    { icon: Headphones, label: 'Help & Support', desc: 'Get assistance', color: 'teal', badge: null },
   ];
 
   const shadowStyle = "shadow-lg shadow-gray-600";
@@ -80,11 +76,7 @@ const ProfileScreen = () => {
     <View className="p-4 space-y-6">
       <View className="space-y-4">
         {profileMenu.map((item, i) => (
-          <TouchableOpacity 
-            key={i} 
-            className={`w-full bg-white rounded-xl p-4 mb-4 ${shadowStyle}`}
-            onPress={() => item.screen && navigation.navigate(item.screen)}
-          >
+          <TouchableOpacity key={i} className={`w-full bg-white rounded-xl p-4 mb-4 ${shadowStyle}`}>
             <View className="flex flex-row items-center">
               <View className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 bg-${item.color}-100`}>
                 <item.icon
@@ -94,8 +86,7 @@ const ProfileScreen = () => {
                     item.color === 'purple' ? '#9333ea' :
                     item.color === 'yellow' ? '#ca8a04' :
                     item.color === 'indigo' ? '#4f46e5' :
-                    item.color === 'teal' ? '#0d9488' :
-                    '#000'
+                    item.color === 'teal' ? '#0d9488' : '#000'
                   }
                 />
               </View>
@@ -113,10 +104,7 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
-      <TouchableOpacity 
-        onPress={logout}
-        className={`w-full flex flex-row items-center justify-center bg-red-100 p-4 rounded-xl gap-2 ${shadowStyle}`}
-      >
+      <TouchableOpacity className={`w-full flex flex-row items-center justify-center bg-red-100 p-4 rounded-xl gap-2 ${shadowStyle}`}>
         <LogOut size={20} color="#dc2626" />
         <Text className="text-base font-medium text-red-600">Logout</Text>
       </TouchableOpacity>
@@ -125,19 +113,16 @@ const ProfileScreen = () => {
 
   const renderOrdersTab = () => (
     <View className="p-4 space-y-6">
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#16a34a" />
-      ) : (
-        <View className="space-y-4">
-          {recentOrders.map((item) => (
-            <View key={item._id} className={`bg-white rounded-xl p-4 mb-4 ${shadowStyle}`}>
-              <View className="flex flex-row justify-between mb-3">
-                <View>
-                  <View className="flex flex-row items-center">
-                    <Text className="text-base font-bold text-gray-900">#{item.orderId}</Text>
-                    <View className="bg-green-100 rounded-xl px-2 py-1 ml-2">
-                      <Text className="text-xs text-green-800 font-semibold">{item.status}</Text>
-                    </View>
+      {/* Removed "Order History" heading as requested */}
+      <View className="space-y-4">
+        {recentOrders.map((item) => (
+          <View key={item.id} className={`bg-white rounded-xl p-4 mb-4 ${shadowStyle}`}>
+            <View className="flex flex-row justify-between mb-3">
+              <View>
+                <View className="flex flex-row items-center">
+                  <Text className="text-base font-bold text-gray-900">#{item.id}</Text>
+                  <View className="bg-green-100 rounded-xl px-2 py-1 ml-2">
+                    <Text className="text-xs text-green-800 font-semibold">{item.status}</Text>
                   </View>
                   <Text className="text-xs text-gray-500 mt-1">{format(new Date(item.createdAt), 'dd MMM yyyy')}</Text>
                 </View>

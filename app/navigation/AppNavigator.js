@@ -1,23 +1,23 @@
-import React from 'react';
 //import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
 import { SCREEN_NAMES } from '../types';
 
 // Auth Screens
-import LoginScreen from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+import LoginScreen from '../screens/auth/LoginScreen';
 import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
 import PhoneVerificationScreen from '../screens/PhoneVerificationScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 
 // Main App Screens
 import MainTabNavigator from './MainTabNavigator';
 import ProductStackNavigator from './ProductsStackNavigator';
 
 // Extra Feature Screens (Add/Edit/Profile)
-import DeleteAddressScreen from '../screens/DeleteAddressScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
+import DeleteAddressScreen from '../screens/DeleteAddressScreen';
+import SettingScreen from '../screens/SettingScreen';
 
 // Loading Screen
 import LoadingScreen from '../screens/LoadingScreen';
@@ -49,11 +49,11 @@ const AppNavigator = () => {
             component={ProductStackNavigator}
             options={{ headerShown: false }}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="ChangePassword"
             component={ChangePasswordScreen}
             options={{ headerShown: true, title: 'Change Password' }}
-          />
+          /> */}
           <Stack.Screen
             name="DeleteAddress"
             component={DeleteAddressScreen}
@@ -63,16 +63,6 @@ const AppNavigator = () => {
             name={SCREEN_NAMES.PRODUCT_DETAILS}
             component={ProductDetailsScreen}
             options={{ headerShown: true }}
-          />
-          <Stack.Screen
-            name="Checkout"
-            component={CheckoutScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="AddAddress"
-            component={AddAddressScreen}
-            options={{ headerShown: false }}
           />
         </>
       ) : (
@@ -101,11 +91,6 @@ const AppNavigator = () => {
             name={SCREEN_NAMES.RESET_PASSWORD}
             component={ResetPasswordScreen}
             options={{ headerShown: true, title: 'Reset Password' }}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.PRODUCT_DETAILS}
-            component={ProductDetailsScreen}
-            options={{ headerShown: true }}
           />
         </>
       )}
